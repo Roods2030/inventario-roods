@@ -314,14 +314,23 @@
                 <!-- Logo y Título -->
                 <div class="relative space-y-4">
                     <!-- Logout Button (Top Right) -->
-                    <button id="logout-btn"
-                        class="absolute -top-12 -right-4 p-2 text-slate-500 hover:text-red-400 transition-colors"
-                        title="Cerrar Sesión">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                    </button>
+                    <div class="absolute -top-12 -right-4 flex items-center gap-2">
+                        <button id="manual-sync-btn" class="p-2 text-slate-500 hover:text-emerald-400 transition-colors"
+                            title="Sincronizar Ahora">
+                            <svg id="sync-icon-svg" class="w-5 h-5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                        <button id="logout-btn" class="p-2 text-slate-500 hover:text-red-400 transition-colors"
+                            title="Cerrar Sesión">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </button>
+                    </div>
 
                     <!-- Sync Indicator -->
                     <div id="sync-indicator"
@@ -1135,6 +1144,7 @@
         let isAuthenticated = false;
         let currentPin = "";
         const CORRECT_PIN = "1234"; // Default PIN
+        let isSyncing = false;
 
         const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycby6b_dDBnO5LlFAYtgG4StJfOuiy6V1j0uiYoZz2NQXWfmNT4wjYOzWBwZKBxa8-vNG/exec';
 
@@ -1209,42 +1219,85 @@
             }
         }
 
-        // Load Data from LocalStorage (initial) and then Sheets
-        async function loadData() {
-            // 1. First load from LocalStorage for speed
-            const savedProviders = localStorage.getItem('providers');
-            if (savedProviders) providers = JSON.parse(savedProviders);
+        // Helper for Smart Merge
+        function mergeArrays(local, remote, key = 'id', sortBy = 'id') {
+            if (!remote || remote.length === 0) return local;
+            const map = new Map();
+            local.forEach(item => map.set(item[key], item));
+            remote.forEach(item => map.set(item[key], item));
 
-            const savedPurchaseHistory = localStorage.getItem('purchaseHistory');
-            if (savedPurchaseHistory) purchaseHistory = JSON.parse(savedPurchaseHistory);
+            const merged = Array.from(map.values());
+            if (sortBy === 'id') {
+                return merged.sort((a, b) => (b.id || "").localeCompare(a.id || ""));
+            }
+            return merged;
+        }
 
-            const savedInventoryHistory = localStorage.getItem('inventoryHistory');
-            if (savedInventoryHistory) inventoryHistory = JSON.parse(savedInventoryHistory);
+        async function loadData(isBackground = false) {
+            if (isSyncing) return;
+            isSyncing = true;
 
-            // 2. Then sync from Sheets
+            if (!isBackground) {
+                // Initial load from LocalStorage
+                const savedProviders = localStorage.getItem('providers');
+                if (savedProviders) providers = JSON.parse(savedProviders);
+
+                const savedPurchaseHistory = localStorage.getItem('purchaseHistory');
+                if (savedPurchaseHistory) purchaseHistory = JSON.parse(savedPurchaseHistory);
+
+                const savedInventoryHistory = localStorage.getItem('inventoryHistory');
+                if (savedInventoryHistory) inventoryHistory = JSON.parse(savedInventoryHistory);
+            }
+
+            const syncIcon = document.getElementById('sync-icon-svg');
+            if (syncIcon) syncIcon.classList.add('animate-spin');
+
             try {
                 updateSyncStatus('syncing');
                 const remote = await sheetsAPI.getAll();
 
+                let changed = false;
+
                 if (remote.providers && remote.providers.length > 0) {
-                    providers = remote.providers;
-                    localStorage.setItem('providers', JSON.stringify(providers));
+                    const newProviders = mergeArrays(providers, remote.providers, 'name', 'none');
+                    if (JSON.stringify(providers) !== JSON.stringify(newProviders)) {
+                        providers = newProviders;
+                        localStorage.setItem('providers', JSON.stringify(providers));
+                        changed = true;
+                    }
                 }
 
-                if (remote.orders && remote.orders.length > 0) {
-                    purchaseHistory = remote.orders;
-                    localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+                if (remote.orders) {
+                    const newOrders = mergeArrays(purchaseHistory, remote.orders, 'id', 'id');
+                    if (JSON.stringify(purchaseHistory) !== JSON.stringify(newOrders)) {
+                        purchaseHistory = newOrders;
+                        localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+                        changed = true;
+                    }
                 }
 
-                if (remote.inventories && remote.inventories.length > 0) {
-                    inventoryHistory = remote.inventories;
-                    localStorage.setItem('inventoryHistory', JSON.stringify(inventoryHistory));
+                if (remote.inventories) {
+                    const newInventories = mergeArrays(inventoryHistory, remote.inventories, 'id', 'id');
+                    if (JSON.stringify(inventoryHistory) !== JSON.stringify(newInventories)) {
+                        inventoryHistory = newInventories;
+                        localStorage.setItem('inventoryHistory', JSON.stringify(inventoryHistory));
+                        changed = true;
+                    }
+                }
+
+                if (changed && !document.getElementById('start-screen').classList.contains('hidden')) {
+                    // Only re-render history if we are on the start screen
+                    renderPurchaseHistory();
+                    renderHistory(); // This is the inventory history function
                 }
 
                 updateSyncStatus('success');
             } catch (e) {
                 updateSyncStatus('error');
                 console.error("Sync failed:", e);
+            } finally {
+                isSyncing = false;
+                if (syncIcon) syncIcon.classList.remove('animate-spin');
             }
         }
 
@@ -1368,6 +1421,16 @@
                     logout();
                 });
             });
+
+            // Manual Sync
+            document.getElementById('manual-sync-btn').addEventListener('click', () => {
+                loadData(true);
+            });
+
+            // Automatic Polling (every 60 seconds)
+            setInterval(() => {
+                if (isAuthenticated) loadData(true);
+            }, 60000);
 
             // Physical keyboard support
             window.addEventListener('keydown', (e) => {

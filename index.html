@@ -1148,11 +1148,13 @@
                 const options = {
                     method: method === 'POST' ? 'POST' : 'GET',
                     mode: 'cors',
-                    cache: 'no-cache'
+                    cache: 'no-cache',
+                    redirect: 'follow'
                 };
 
                 if (method === 'POST') {
                     options.body = JSON.stringify({ action, data });
+                    // Explicitly NOT setting application/json to avoid preflight
                 }
 
                 try {

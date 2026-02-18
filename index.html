@@ -1259,10 +1259,10 @@
 
                 let changed = false;
 
-                if (remote.providers && remote.providers.length > 0) {
-                    const newProviders = mergeArrays(providers, remote.providers, 'name', 'none');
-                    if (JSON.stringify(providers) !== JSON.stringify(newProviders)) {
-                        providers = newProviders;
+                if (remote.providers) {
+                    // Providers ARE the source of truth (to allow deletions)
+                    if (JSON.stringify(providers) !== JSON.stringify(remote.providers)) {
+                        providers = remote.providers;
                         localStorage.setItem('providers', JSON.stringify(providers));
                         changed = true;
                     }
@@ -1286,10 +1286,14 @@
                     }
                 }
 
-                if (changed && !document.getElementById('start-screen').classList.contains('hidden')) {
-                    // Only re-render history if we are on the start screen
-                    renderPurchaseHistory();
-                    renderHistory(); // This is the inventory history function
+                if (changed) {
+                    if (!document.getElementById('start-screen').classList.contains('hidden')) {
+                        renderPurchaseHistory();
+                        renderHistory(); // This is the inventory history function
+                    }
+                    if (!document.getElementById('settings-modal').classList.contains('hidden')) {
+                        renderProvidersSettings();
+                    }
                 }
 
                 updateSyncStatus('success');

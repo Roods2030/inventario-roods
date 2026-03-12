@@ -8,8 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap"
         rel="stylesheet">
-    <script src="/_sdk/element_sdk.js"></script>
-    <script src="/_sdk/data_sdk.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -497,723 +495,735 @@
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                         </svg> <span id="pause-text">Pausar</span> </button>
+                    <button type="button" id="finish-inventory-btn"
+                        class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg transition text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg> Finalizar </button>
                 </div>
 
                 <!-- Form -->
                 <form id="inventory-form-capture" class="max-w-4xl mx-auto space-y-6 pb-20"></form>
-            </div><!-- Pantalla de Resumen Final -->
-            <div id="summary-screen"
-                class="hidden min-h-full bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 py-8 px-4 flex flex-col items-center justify-center">
-                <div class="max-w-2xl w-full space-y-6 animate-in"><!-- Checkmark animado -->
-                    <div class="flex justify-center">
-                        <div
-                            class="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-2xl">
-                            <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                    </div><!-- Título -->
-                    <div class="text-center">
-                        <h1 class="text-4xl font-bold text-white mb-2">¡Inventario Completado!</h1>
-                        <p class="text-slate-300 text-lg">Resumen de tu captura</p>
-                    </div><!-- Información de Tiempos -->
-                    <div class="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700 space-y-4">
-                        <div class="flex items-center justify-between pb-4 border-b border-slate-600"><span
-                                class="text-slate-400 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor"
-                                    viewbox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg> Hora de Inicio </span> <span id="summary-start-time"
-                                class="text-white font-semibold">--:-- AM</span>
-                        </div>
-                        <div class="flex items-center justify-between pb-4 border-b border-slate-600"><span
-                                class="text-slate-400 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor"
-                                    viewbox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg> Hora de Finalización </span> <span id="summary-end-time"
-                                class="text-white font-semibold">--:-- AM</span>
-                        </div>
-                        <div class="flex items-center justify-between"><span
-                                class="text-slate-400 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor"
-                                    viewbox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg> Duración Total </span> <span id="summary-duration"
-                                class="text-white font-semibold text-lg">00:00:00</span>
-                        </div>
-                    </div><!-- Estadísticas -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-slate-700/50 rounded-lg p-4 text-center border border-slate-600">
-                            <div class="text-2xl font-bold text-emerald-400" id="total-providers">
-                                0
-                            </div>
-                            <p class="text-slate-400 text-sm mt-2">Proveedores</p>
-                        </div>
-                        <div class="bg-slate-700/50 rounded-lg p-4 text-center border border-slate-600">
-                            <div class="text-2xl font-bold text-blue-400" id="total-items">
-                                0
-                            </div>
-                            <p class="text-slate-400 text-sm mt-2">Insumos</p>
-                        </div>
-                    </div><!-- Botones de Acción -->
-                    <div class="space-y-3 pt-4"><button type="button" id="download-summary-btn"
-                            class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition inline-flex items-center justify-center gap-3">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg> Descargar Excel </button> <button type="button" id="new-inventory-btn"
-                            class="w-full bg-blue-500 hover:bg-blue-400 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition inline-flex items-center justify-center gap-3">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg> Nuevo Inventario </button> <button type="button" id="back-to-start-btn"
-                            class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition">
-                            Volver al Inicio </button>
-                    </div>
-                </div>
             </div>
+        </div>
 
-            <!-- Pantalla de Inicio de Órdenes -->
-            <div id="purchase-home-screen"
-                class="hidden min-h-full bg-gradient-to-br from-slate-900 via-slate-800 to-purple-900 py-8 px-4">
-                <div class="max-w-6xl mx-auto">
-                    <div class="mb-8 flex items-center justify-between">
-                        <div>
-                            <h1 class="text-3xl font-bold text-white flex items-center gap-3 mb-2">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg> Órdenes de Compra
-                            </h1>
-                            <p class="text-slate-400">Genera y gestiona tus pedidos a proveedores</p>
-                        </div><button id="back-from-purchase-btn"
-                            class="px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition">
-                            ← Volver </button>
-                    </div>
-                    <!-- Botón Principal -->
-                    <button id="new-purchase-order-btn"
-                        class="w-full mb-8 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white font-bold py-4 px-6 rounded-xl shadow-xl transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3">
+        <!-- View Inventory Detail Modal -->
+        <div id="inventory-detail-modal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div
+                class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+                <!-- Modal Header -->
+                <div class="bg-gradient-to-r from-amber-500 to-orange-600 p-6 flex items-center justify-between">
+                    <div>
+                        <h2 id="detail-modal-title" class="text-2xl font-bold text-white">Detalles del Inventario
+                        </h2>
+                        <p id="detail-modal-user" class="text-amber-100 text-sm mt-1">Usuario: --</p>
+                    </div><button type="button" id="close-detail-modal-btn"
+                        class="text-white hover:bg-white/20 p-2 rounded-lg transition">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg> Nueva Orden de Compra
-                    </button>
-
-                    <!-- Historial de Órdenes -->
-                    <h2 class="text-xl font-bold text-white mb-4">Últimas Órdenes Generadas</h2>
-                    <div id="purchase-history-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Orders will be rendered here -->
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg></button>
+                </div><!-- Modal Content -->
+                <div class="overflow-y-auto flex-1 p-6 space-y-4"><!-- Info section -->
+                    <div
+                        class="bg-slate-700/50 rounded-lg p-4 grid grid-cols-2 md:grid-cols-4 gap-4 border border-slate-600">
+                        <div>
+                            <p class="text-slate-400 text-xs font-medium mb-1">Inicio</p>
+                            <p id="detail-start-time" class="text-white font-semibold">--:-- AM</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs font-medium mb-1">Finalización</p>
+                            <p id="detail-end-time" class="text-white font-semibold">--:-- AM</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs font-medium mb-1">Duración</p>
+                            <p id="detail-duration" class="text-white font-semibold">00:00:00</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs font-medium mb-1">Fecha</p>
+                            <p id="detail-date" class="text-white font-semibold">--/--/--</p>
+                        </div>
+                    </div><!-- Data table -->
+                    <div class="bg-slate-700/50 rounded-lg overflow-hidden border border-slate-600">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-600 border-b border-slate-500">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-slate-300 font-semibold">Proveedor</th>
+                                    <th class="px-4 py-3 text-left text-slate-300 font-semibold">Producto</th>
+                                    <th class="px-4 py-3 text-center text-slate-300 font-semibold">Unidad</th>
+                                    <th class="px-4 py-3 text-center text-slate-300 font-semibold">Existencias</th>
+                                    <th class="px-4 py-3 text-center text-slate-300 font-semibold">Compras</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-data-body" class="divide-y divide-slate-600">
+                                <!-- Data rows will be rendered here -->
+                            </tbody>
+                        </table>
                     </div>
-                    <div id="purchase-history-empty"
-                        class="flex flex-col items-center justify-center py-10 bg-slate-800/30 rounded-xl">
-                        <p class="text-slate-400">No hay órdenes registradas aún</p>
-                    </div>
+                </div><!-- Modal Footer -->
+                <div class="border-t border-slate-700 p-6 flex gap-3 justify-between bg-slate-900"><button type="button"
+                        id="download-detail-excel-btn"
+                        class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition inline-flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg> Descargar </button> <button type="button" id="close-detail-modal-btn-footer"
+                        class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
+                        Cerrar </button>
                 </div>
             </div>
-
-            <!-- Pantalla de Configuración de Orden -->
-            <div id="purchase-setup-screen"
-                class="hidden min-h-full bg-slate-900 py-8 px-4 flex items-center justify-center">
-                <div class="max-w-md w-full bg-slate-800 rounded-2xl p-6 shadow-2xl animate-in">
-                    <h2 class="text-2xl font-bold text-white mb-6">Configurar Nueva Orden</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-slate-300 text-sm font-medium mb-2">Solicitante</label>
-                            <input type="text" id="purchase-requester-input"
-                                class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 text-sm font-medium mb-2">Inventario Base</label>
-                            <select id="purchase-inventory-select"
-                                class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                <!-- Options rendered via JS -->
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 text-sm font-medium mb-2">Observaciones Generales</label>
-                            <textarea id="purchase-notes-input" rows="3"
-                                class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                placeholder="Ej: Entrega urgente antes del viernes..."></textarea>
-                        </div>
-                    </div>
-                    <div class="mt-8 flex gap-3">
-                        <button id="cancel-purchase-setup-btn"
-                            class="flex-1 px-4 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                            Cancelar </button>
-                        <button id="generate-purchase-btn"
-                            class="flex-1 px-4 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold transition">
-                            Generar Órdenes </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pantalla de Vista Previa de Órdenes -->
-            <div id="purchase-preview-screen"
-                class="hidden min-h-full bg-gradient-to-br from-slate-900 via-slate-800 to-purple-900 py-8 px-4">
-                <div class="max-w-5xl mx-auto">
-                    <div class="mb-8 flex items-center justify-between">
-                        <h1 class="text-2xl font-bold text-white">Vista Previa de Órdenes</h1>
-                        <button id="close-purchase-preview-btn"
-                            class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium transition">
-                            Cerrar </button>
-                    </div>
-                    <div id="purchase-orders-container" class="space-y-6">
-                        <!-- Order cards per provider -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pantalla de Monitor de Compras -->
-            <div id="monitor-screen"
-                class="hidden min-h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 px-4">
-                <div class="max-w-6xl mx-auto">
-                    <div class="mb-8 flex items-center justify-between">
-                        <div>
-                            <h1 class="text-3xl font-bold text-white flex items-center gap-3 mb-2">
-                                <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg> Monitor de Compras
-                            </h1>
-                            <p class="text-slate-400">Seguimiento de estados por proveedor</p>
-                        </div>
-                        <button id="back-from-monitor-btn"
-                            class="px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition">
-                            ← Volver </button>
-                    </div>
-
-                    <div id="monitor-content" class="space-y-8">
-                        <!-- Workflow columns or status rows will be rendered here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- User Name Modal - Ask for username before starting inventory -->
-            <div id="user-name-modal"
-                class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full"><!-- Modal Header -->
-                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 flex items-center justify-between">
-                        <h2 class="text-2xl font-bold text-white">Información del Operario</h2>
-                    </div><!-- Modal Content -->
-                    <div class="p-6 space-y-4">
-                        <div><label class="block text-slate-300 text-sm font-medium mb-2">¿Quién realiza el
-                                inventario?</label>
-                            <input type="text" id="user-name-input" placeholder="Ingresa tu nombre completo"
-                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                                autocomplete="off">
-                        </div>
-                    </div><!-- Modal Footer -->
-                    <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900"><button type="button"
-                            id="cancel-user-name-btn"
-                            class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                            Cancelar </button> <button type="button" id="confirm-user-name-btn"
-                            class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">
-                            Continuar </button>
-                    </div>
-                </div>
-            </div><!-- View Inventory Detail Modal -->
-            <div id="inventory-detail-modal"
-                class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div
-                    class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                    <!-- Modal Header -->
-                    <div class="bg-gradient-to-r from-amber-500 to-orange-600 p-6 flex items-center justify-between">
-                        <div>
-                            <h2 id="detail-modal-title" class="text-2xl font-bold text-white">Detalles del Inventario
-                            </h2>
-                            <p id="detail-modal-user" class="text-amber-100 text-sm mt-1">Usuario: --</p>
-                        </div><button type="button" id="close-detail-modal-btn"
-                            class="text-white hover:bg-white/20 p-2 rounded-lg transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg></button>
-                    </div><!-- Modal Content -->
-                    <div class="overflow-y-auto flex-1 p-6 space-y-4"><!-- Info section -->
-                        <div
-                            class="bg-slate-700/50 rounded-lg p-4 grid grid-cols-2 md:grid-cols-4 gap-4 border border-slate-600">
-                            <div>
-                                <p class="text-slate-400 text-xs font-medium mb-1">Inicio</p>
-                                <p id="detail-start-time" class="text-white font-semibold">--:-- AM</p>
-                            </div>
-                            <div>
-                                <p class="text-slate-400 text-xs font-medium mb-1">Finalización</p>
-                                <p id="detail-end-time" class="text-white font-semibold">--:-- AM</p>
-                            </div>
-                            <div>
-                                <p class="text-slate-400 text-xs font-medium mb-1">Duración</p>
-                                <p id="detail-duration" class="text-white font-semibold">00:00:00</p>
-                            </div>
-                            <div>
-                                <p class="text-slate-400 text-xs font-medium mb-1">Fecha</p>
-                                <p id="detail-date" class="text-white font-semibold">--/--/--</p>
-                            </div>
-                        </div><!-- Data table -->
-                        <div class="bg-slate-700/50 rounded-lg overflow-hidden border border-slate-600">
-                            <table class="w-full text-sm">
-                                <thead class="bg-slate-600 border-b border-slate-500">
-                                    <tr>
-                                        <th class="px-4 py-3 text-left text-slate-300 font-semibold">Proveedor</th>
-                                        <th class="px-4 py-3 text-left text-slate-300 font-semibold">Producto</th>
-                                        <th class="px-4 py-3 text-center text-slate-300 font-semibold">Unidad</th>
-                                        <th class="px-4 py-3 text-center text-slate-300 font-semibold">Existencias</th>
-                                        <th class="px-4 py-3 text-center text-slate-300 font-semibold">Compras</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="detail-data-body" class="divide-y divide-slate-600">
-                                    <!-- Data rows will be rendered here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div><!-- Modal Footer -->
-                    <div class="border-t border-slate-700 p-6 flex gap-3 justify-between bg-slate-900"><button
-                            type="button" id="download-detail-excel-btn"
-                            class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition inline-flex items-center gap-2">
+        </div><!-- Settings Modal - Providers List -->
+        <div id="settings-modal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div
+                class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+                <!-- Modal Header -->
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-white">Gestionar Proveedores</h2><button type="button"
+                        id="close-settings-btn" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg></button>
+                </div><!-- Modal Content -->
+                <div id="settings-content" class="overflow-y-auto flex-1 p-6">
+                    <!-- Providers will be rendered here -->
+                </div><!-- Modal Footer -->
+                <div class="border-t border-slate-700 p-6 flex gap-3 justify-between bg-slate-900">
+                    <div class="flex gap-3"><button type="button" id="import-excel-btn"
+                            class="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-white font-medium transition inline-flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg> Descargar </button> <button type="button" id="close-detail-modal-btn-footer"
-                            class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                            Cerrar </button>
-                    </div>
+                            </svg> Importar Excel </button> <button type="button" id="add-provider-btn"
+                            class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">
+                            + Agregar Proveedor </button>
+                    </div><button type="button" id="close-settings-modal-btn"
+                        class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
+                        Cerrar </button>
                 </div>
-            </div><!-- Settings Modal - Providers List -->
-            <div id="settings-modal"
-                class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            </div>
+        </div><!-- Edit Provider Modal -->
+        <div id="edit-provider-modal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div
+                class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden">
+                <!-- Modal Header -->
                 <div
-                    class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                    <!-- Modal Header -->
-                    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 flex items-center justify-between">
-                        <h2 class="text-2xl font-bold text-white">Gestionar Proveedores</h2><button type="button"
-                            id="close-settings-btn" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg></button>
-                    </div><!-- Modal Content -->
-                    <div id="settings-content" class="overflow-y-auto flex-1 p-6">
-                        <!-- Providers will be rendered here -->
-                    </div><!-- Modal Footer -->
-                    <div class="border-t border-slate-700 p-6 flex gap-3 justify-between bg-slate-900">
-                        <div class="flex gap-3"><button type="button" id="import-excel-btn"
-                                class="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-white font-medium transition inline-flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg> Importar Excel </button> <button type="button" id="add-provider-btn"
-                                class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">
-                                + Agregar Proveedor </button>
-                        </div><button type="button" id="close-settings-modal-btn"
-                            class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                            Cerrar </button>
+                    class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 flex items-center justify-between shrink-0">
+                    <h2 class="text-2xl font-bold text-white">Editar Proveedor</h2><button type="button"
+                        id="close-edit-provider-btn" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg></button>
+                </div><!-- Modal Content -->
+                <div class="p-6 space-y-4 overflow-y-auto flex-1">
+                    <div><label class="block text-slate-300 text-sm font-medium mb-2">Nombre del Proveedor</label>
+                        <input type="text" id="edit-provider-name-input" placeholder="Ej: Frutas Frescas"
+                            class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
-                </div>
-            </div><!-- Edit Provider Modal -->
-            <div id="edit-provider-modal"
-                class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div
-                    class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden">
-                    <!-- Modal Header -->
-                    <div
-                        class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 flex items-center justify-between shrink-0">
-                        <h2 class="text-2xl font-bold text-white">Editar Proveedor</h2><button type="button"
-                            id="close-edit-provider-btn" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg></button>
-                    </div><!-- Modal Content -->
-                    <div class="p-6 space-y-4 overflow-y-auto flex-1">
-                        <div><label class="block text-slate-300 text-sm font-medium mb-2">Nombre del Proveedor</label>
-                            <input type="text" id="edit-provider-name-input" placeholder="Ej: Frutas Frescas"
+                    <div><label class="block text-slate-300 text-sm font-medium mb-2">Emoji del Proveedor</label>
+                        <div class="grid grid-cols-6 gap-2"><button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🥬">🥬</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🥩">🥩</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🧀">🧀</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🛒">🛒</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🍎">🍎</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🌶️">🌶️</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🍞">🍞</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🥚">🥚</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🥫">🥫</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="📦">📦</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🚚">🚚</button> <button type="button"
+                                class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="⭐">⭐</button>
+                        </div><input type="hidden" id="edit-provider-emoji-input" value="🥬">
+                    </div>
+                    <div><label class="block text-slate-300 text-sm font-medium mb-2">Color del Proveedor</label>
+                        <select id="edit-provider-color-input"
+                            class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="from-green-500 to-emerald-600">Verde - Frutas y Verduras</option>
+                            <option value="from-red-500 to-rose-600">Rojo - Carnes</option>
+                            <option value="from-yellow-500 to-amber-600">Amarillo - Lácteos</option>
+                            <option value="from-blue-500 to-indigo-600">Azul - Abarrotes</option>
+                            <option value="from-purple-500 to-violet-600">Púrpura - Bebidas</option>
+                            <option value="from-pink-500 to-rose-600">Rosa - Postres</option>
+                            <option value="from-orange-500 to-amber-600">Naranja - Panadería</option>
+                            <option value="from-cyan-500 to-blue-600">Cyan - Congelados</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-slate-300 text-sm font-medium mb-2">Nombre de Contacto</label>
+                            <input type="text" id="edit-provider-contact-input" placeholder="Ej: Juan Pérez"
                                 class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
-                        <div><label class="block text-slate-300 text-sm font-medium mb-2">Emoji del Proveedor</label>
-                            <div class="grid grid-cols-6 gap-2"><button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🥬">🥬</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🥩">🥩</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🧀">🧀</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🛒">🛒</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🍎">🍎</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🌶️">🌶️</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🍞">🍞</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🥚">🥚</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🥫">🥫</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="📦">📦</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🚚">🚚</button> <button type="button"
-                                    class="edit-emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="⭐">⭐</button>
-                            </div><input type="hidden" id="edit-provider-emoji-input" value="🥬">
+                        <div>
+                            <label class="block text-slate-300 text-sm font-medium mb-2">Teléfono</label>
+                            <input type="tel" id="edit-provider-phone-input" placeholder="Ej: 55 1234 5678"
+                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
-                        <div><label class="block text-slate-300 text-sm font-medium mb-2">Color del Proveedor</label>
-                            <select id="edit-provider-color-input"
-                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="from-green-500 to-emerald-600">Verde - Frutas y Verduras</option>
-                                <option value="from-red-500 to-rose-600">Rojo - Carnes</option>
-                                <option value="from-yellow-500 to-amber-600">Amarillo - Lácteos</option>
-                                <option value="from-blue-500 to-indigo-600">Azul - Abarrotes</option>
-                                <option value="from-purple-500 to-violet-600">Púrpura - Bebidas</option>
-                                <option value="from-pink-500 to-rose-600">Rosa - Postres</option>
-                                <option value="from-orange-500 to-amber-600">Naranja - Panadería</option>
-                                <option value="from-cyan-500 to-blue-600">Cyan - Congelados</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-slate-300 text-sm font-medium mb-2">Nombre de Contacto</label>
-                                <input type="text" id="edit-provider-contact-input" placeholder="Ej: Juan Pérez"
-                                    class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-slate-300 text-sm font-medium mb-2">Teléfono</label>
-                                <input type="tel" id="edit-provider-phone-input" placeholder="Ej: 55 1234 5678"
-                                    class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-2">Método de Pago
+                            Preferido</label>
+                        <select id="edit-provider-payment-input"
+                            class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Link de Pago">Link de Pago</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-slate-300 text-sm font-medium mb-2">Banco</label>
+                            <input type="text" id="edit-provider-bank-input" placeholder="Ej: BBVA"
+                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                         <div>
-                            <label class="block text-slate-300 text-sm font-medium mb-2">Método de Pago
-                                Preferido</label>
-                            <select id="edit-provider-payment-input"
-                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="Efectivo">Efectivo</option>
-                                <option value="Transferencia">Transferencia</option>
-                                <option value="Tarjeta">Tarjeta</option>
-                                <option value="Link de Pago">Link de Pago</option>
-                            </select>
+                            <label class="block text-slate-300 text-sm font-medium mb-2">No. Cuenta / CLABE</label>
+                            <input type="text" id="edit-provider-account-input" placeholder="0123456789"
+                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-slate-300 text-sm font-medium mb-2">Banco</label>
-                                <input type="text" id="edit-provider-bank-input" placeholder="Ej: BBVA"
-                                    class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-slate-300 text-sm font-medium mb-2">No. Cuenta / CLABE</label>
-                                <input type="text" id="edit-provider-account-input" placeholder="0123456789"
-                                    class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                        </div>
-                    </div><!-- Modal Footer -->
-                    <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900 shrink-0"><button
-                            type="button" id="cancel-edit-provider-btn"
-                            class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                            Cancelar </button> <button type="button" id="save-edit-provider-btn"
-                            class="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-white font-medium transition">
-                            Guardar Cambios </button>
                     </div>
-                </div>
-            </div><!-- Import Excel Modal -->
-            <div id="import-modal"
-                class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full"><!-- Modal Header -->
-                    <div class="bg-gradient-to-r from-blue-500 to-cyan-600 p-6 flex items-center justify-between">
-                        <h2 class="text-2xl font-bold text-white">Importar Datos desde Excel</h2><button type="button"
-                            id="close-import-btn" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg></button>
-                    </div><!-- Modal Content -->
-                    <div class="p-6 space-y-4">
-                        <div class="bg-slate-700/50 rounded-lg p-4 border border-slate-600">
-                            <h3 class="text-white font-semibold mb-2">Formato de archivo requerido:</h3>
-                            <p class="text-slate-300 text-sm mb-3">Tu archivo Excel debe tener las siguientes columnas:
-                            </p>
-                            <div class="bg-slate-600 rounded p-3 text-slate-100 text-xs font-mono space-y-1">
-                                <div>
-                                    <strong>Columna A:</strong> Proveedor (nombre del proveedor)
-                                </div>
-                                <div>
-                                    <strong>Columna B:</strong> Producto (nombre del insumo)
-                                </div>
-                                <div>
-                                    <strong>Columna C:</strong> Unidad (Pieza, Unidad, Caja, Kilogramo, Litro)
-                                </div>
-                                <div>
-                                    <strong>Columna D:</strong> Precio Unitario (Opcional)
-                                </div>
-                            </div>
-                            <p class="text-slate-400 text-xs mt-3">La primera fila debe contener los encabezados.</p>
-                        </div>
-                        <div class="border-2 border-dashed border-slate-500 rounded-lg p-8 text-center"><input
-                                type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" class="hidden"> <button
-                                type="button" id="file-upload-btn"
-                                class="inline-flex items-center gap-3 bg-blue-500 hover:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg> Seleccionar Archivo </button>
-                            <p id="file-name-display" class="text-slate-400 text-sm mt-3">Ningún archivo seleccionado
-                            </p>
-                        </div>
-                        <div id="import-preview" class="hidden space-y-3">
-                            <h3 class="text-white font-semibold">Vista previa de datos:</h3>
-                            <div id="preview-content" class="bg-slate-700/50 rounded-lg p-4 max-h-64 overflow-y-auto">
-                                <!-- Preview will be rendered here -->
-                            </div>
-                        </div>
-                        <div id="import-error" class="hidden bg-red-500/20 border border-red-500 rounded-lg p-4">
-                            <p id="error-message" class="text-red-300 text-sm"></p>
-                        </div>
-                    </div><!-- Modal Footer -->
-                    <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900"><button type="button"
-                            id="cancel-import-btn"
-                            class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                            Cancelar </button> <button type="button" id="confirm-import-btn" disabled
-                            class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium transition">
-                            Importar Datos </button>
-                    </div>
-                </div>
-            </div><!-- Items Modal - Edit Items for Provider -->
-            <div id="items-modal"
-                class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div
-                    class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                    <!-- Modal Header -->
-                    <div id="items-header"
-                        class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 flex items-center justify-between">
-                        <div class="flex items-center gap-3"><span id="provider-icon" class="text-4xl"></span>
-                            <h2 id="items-title" class="text-2xl font-bold text-white">Insumos</h2>
-                        </div><button type="button" id="close-items-btn"
-                            class="text-white hover:bg-white/20 p-2 rounded-lg transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg></button>
-                    </div><!-- Modal Content -->
-                    <div id="items-content" class="overflow-y-auto flex-1 p-6 space-y-4">
-                        <!-- Items will be rendered here -->
-                    </div><!-- Modal Footer -->
-                    <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900"><button type="button"
-                            id="add-item-btn"
-                            class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">
-                            + Agregar Insumo </button> <button type="button" id="close-items-modal-btn"
-                            class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                            Cerrar </button>
-                    </div>
-                </div>
-            </div><!-- Add Provider Modal -->
-            <div id="add-provider-modal"
-                class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div
-                    class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden">
-                    <!-- Modal Header -->
-                    <div
-                        class="bg-gradient-to-r from-emerald-500 to-green-600 p-6 flex items-center justify-between shrink-0">
-                        <h2 class="text-2xl font-bold text-white">Nuevo Proveedor</h2><button type="button"
-                            id="close-add-provider-btn" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg></button>
-                    </div><!-- Modal Content -->
-                    <div class="p-6 space-y-4 overflow-y-auto flex-1">
-                        <div><label class="block text-slate-300 text-sm font-medium mb-2">Nombre del Proveedor</label>
-                            <input type="text" id="provider-name-input" placeholder="Ej: Frutas Frescas"
-                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                        </div>
-                        <div><label class="block text-slate-300 text-sm font-medium mb-2">Emoji del Proveedor</label>
-                            <div class="grid grid-cols-6 gap-2"><button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🥬">🥬</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🥩">🥩</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🧀">🧀</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🛒">🛒</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🍎">🍎</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🌶️">🌶️</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🍞">🍞</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🥚">🥚</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🥫">🥫</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="📦">📦</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="🚚">🚚</button> <button type="button"
-                                    class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
-                                    data-emoji="⭐">⭐</button>
-                            </div><input type="hidden" id="provider-emoji-input" value="🥬">
-                        </div>
-                        <div><label class="block text-slate-300 text-sm font-medium mb-2">Color del Proveedor</label>
-                            <select id="provider-color-input"
-                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                                <option value="from-green-500 to-emerald-600">Verde - Frutas y Verduras</option>
-                                <option value="from-red-500 to-rose-600">Rojo - Carnes</option>
-                                <option value="from-yellow-500 to-amber-600">Amarillo - Lácteos</option>
-                                <option value="from-blue-500 to-indigo-600">Azul - Abarrotes</option>
-                                <option value="from-purple-500 to-violet-600">Púrpura - Bebidas</option>
-                                <option value="from-pink-500 to-rose-600">Rosa - Postres</option>
-                                <option value="from-orange-500 to-amber-600">Naranja - Panadería</option>
-                                <option value="from-cyan-500 to-blue-600">Cyan - Congelados</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-slate-300 text-sm font-medium mb-2">Nombre de Contacto</label>
-                                <input type="text" id="provider-contact-input" placeholder="Ej: Juan Pérez"
-                                    class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-slate-300 text-sm font-medium mb-2">Teléfono</label>
-                                <input type="tel" id="provider-phone-input" placeholder="Ej: 55 1234 5678"
-                                    class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 text-sm font-medium mb-2">Método de Pago
-                                Preferido</label>
-                            <select id="provider-payment-input"
-                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                                <option value="Efectivo">Efectivo</option>
-                                <option value="Transferencia">Transferencia</option>
-                                <option value="Tarjeta">Tarjeta</option>
-                                <option value="Link de Pago">Link de Pago</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-slate-300 text-sm font-medium mb-2">Banco</label>
-                                <input type="text" id="provider-bank-input" placeholder="Ej: BBVA"
-                                    class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-slate-300 text-sm font-medium mb-2">No. Cuenta / CLABE</label>
-                                <input type="text" id="provider-account-input" placeholder="0123456789"
-                                    class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                            </div>
-                        </div>
-                    </div><!-- Modal Footer -->
-                    <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900"><button type="button"
-                            id="cancel-add-provider-btn"
-                            class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                            Cancelar </button> <button type="button" id="save-add-provider-btn"
-                            class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">
-                            Crear Proveedor </button>
-                    </div>
+                </div><!-- Modal Footer -->
+                <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900 shrink-0"><button
+                        type="button" id="cancel-edit-provider-btn"
+                        class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
+                        Cancelar </button> <button type="button" id="save-edit-provider-btn"
+                        class="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-white font-medium transition">
+                        Guardar Cambios </button>
                 </div>
             </div>
-            <!-- Edit Order Modal -->
-            <div id="edit-order-modal"
-                class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div
-                    class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                    <div class="bg-gradient-to-r from-purple-500 to-indigo-600 p-6 flex items-center justify-between">
-                        <div>
-                            <h2 class="text-2xl font-bold text-white">Editar Orden</h2>
-                            <p id="edit-order-subtitle" class="text-purple-100 text-sm">Proveedor: --</p>
-                        </div>
-                        <button type="button" id="close-edit-order-btn"
-                            class="text-white hover:bg-white/20 p-2 rounded-lg transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div id="edit-order-content" class="overflow-y-auto flex-1 p-6 space-y-4">
-                        <!-- Items -->
-                    </div>
-                    <div class="border-t border-slate-700 p-6 flex items-center justify-between bg-slate-900 gap-4">
-                        <!-- Add Product UI -->
-                        <div id="add-to-order-container" class="flex-1 hidden">
-                            <div class="flex gap-2">
-                                <select id="add-item-to-order-select"
-                                    class="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                    <!-- Options via JS -->
-                                </select>
-                                <button type="button" id="confirm-add-item-btn"
-                                    class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition">Añadir</button>
-                                <button type="button" id="cancel-add-item-btn"
-                                    class="bg-slate-700 hover:bg-slate-600 text-slate-400 px-3 py-2 rounded-lg transition">✕</button>
-                            </div>
-                        </div>
-
-                        <button type="button" id="show-add-item-btn"
-                            class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-purple-400 font-bold transition flex items-center gap-2 whitespace-nowrap">
-                            <span>➕</span> Añadir Producto
-                        </button>
-
-                        <div class="flex gap-3">
-                            <button type="button" id="cancel-edit-order-btn"
-                                class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">Cancelar</button>
-                            <button type="button" id="save-edit-order-btn"
-                                class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">Guardar
-                                Cambios</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Finance Modal -->
-            <div id="finance-modal"
-                class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div
-                    class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col">
-                    <div class="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 flex items-center justify-between">
-                        <div>
-                            <h2 class="text-2xl font-bold text-white">Solicitud de Pago</h2>
-                            <p class="text-blue-100 text-sm">Para Finanzas</p>
-                        </div>
-                        <button type="button" id="close-finance-modal-btn"
-                            class="text-white hover:bg-white/20 p-2 rounded-lg transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
+        </div><!-- Import Excel Modal -->
+        <div id="import-modal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full"><!-- Modal Header -->
+                <div class="bg-gradient-to-r from-blue-500 to-cyan-600 p-6 flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-white">Importar Datos desde Excel</h2><button type="button"
+                        id="close-import-btn" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg></button>
+                </div><!-- Modal Content -->
+                <div class="p-6 space-y-4">
+                    <div class="bg-slate-700/50 rounded-lg p-4 border border-slate-600">
+                        <h3 class="text-white font-semibold mb-2">Formato de archivo requerido:</h3>
+                        <p class="text-slate-300 text-sm mb-3">Tu archivo Excel debe tener las siguientes columnas:
+                        </p>
+                        <div class="bg-slate-600 rounded p-3 text-slate-100 text-xs font-mono space-y-1">
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">Fecha Máxima de Pago</label>
-                                <input type="date" id="finance-payment-date"
-                                    class="w-full bg-slate-700 text-white rounded-lg p-2 text-sm border border-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                <strong>Columna A:</strong> Proveedor (nombre del proveedor)
                             </div>
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">Fecha Aprox. Recepción</label>
-                                <input type="date" id="finance-delivery-date"
-                                    class="w-full bg-slate-700 text-white rounded-lg p-2 text-sm border border-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                <strong>Columna B:</strong> Producto (nombre del insumo)
+                            </div>
+                            <div>
+                                <strong>Columna C:</strong> Unidad (Pieza, Unidad, Caja, Kilogramo, Litro)
+                            </div>
+                            <div>
+                                <strong>Columna D:</strong> Precio Unitario (Opcional)
                             </div>
                         </div>
-                        <div class="bg-slate-900 p-4 rounded-lg font-mono text-sm text-slate-300 select-all"
-                            id="finance-request-text">
-                            <!-- Request Text -->
-                        </div>
-                        <p class="text-xs text-slate-500 text-center">Selecciona las fechas y copia el texto para
-                            Finanzas.
+                        <p class="text-slate-400 text-xs mt-3">La primera fila debe contener los encabezados.</p>
+                    </div>
+                    <div class="border-2 border-dashed border-slate-500 rounded-lg p-8 text-center"><input type="file"
+                            id="excel-file-input" accept=".xlsx,.xls,.csv" class="hidden"> <button type="button"
+                            id="file-upload-btn"
+                            class="inline-flex items-center gap-3 bg-blue-500 hover:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg> Seleccionar Archivo </button>
+                        <p id="file-name-display" class="text-slate-400 text-sm mt-3">Ningún archivo seleccionado
                         </p>
                     </div>
-                    <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900 shrink-0">
-                        <button type="button" id="mark-requested-btn"
-                            class="px-6 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-500 text-white font-medium transition">Marcar
-                            como Solicitado</button>
-                        <button type="button" id="copy-finance-btn"
-                            class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition">Copiar
-                            Texto</button>
+                    <div id="import-preview" class="hidden space-y-3">
+                        <h3 class="text-white font-semibold">Vista previa de datos:</h3>
+                        <div id="preview-content" class="bg-slate-700/50 rounded-lg p-4 max-h-64 overflow-y-auto">
+                            <!-- Preview will be rendered here -->
+                        </div>
+                    </div>
+                    <div id="import-error" class="hidden bg-red-500/20 border border-red-500 rounded-lg p-4">
+                        <p id="error-message" class="text-red-300 text-sm"></p>
+                    </div>
+                </div><!-- Modal Footer -->
+                <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900"><button type="button"
+                        id="cancel-import-btn"
+                        class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
+                        Cancelar </button> <button type="button" id="confirm-import-btn" disabled
+                        class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium transition">
+                        Importar Datos </button>
+                </div>
+            </div>
+        </div><!-- Items Modal - Edit Items for Provider -->
+        <div id="items-modal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div
+                class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+                <!-- Modal Header -->
+                <div id="items-header"
+                    class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 flex items-center justify-between">
+                    <div class="flex items-center gap-3"><span id="provider-icon" class="text-4xl"></span>
+                        <h2 id="items-title" class="text-2xl font-bold text-white">Insumos</h2>
+                    </div><button type="button" id="close-items-btn"
+                        class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg></button>
+                </div><!-- Modal Content -->
+                <div id="items-content" class="overflow-y-auto flex-1 p-6 space-y-4">
+                    <!-- Items will be rendered here -->
+                </div><!-- Modal Footer -->
+                <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900"><button type="button"
+                        id="add-item-btn"
+                        class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">
+                        + Agregar Insumo </button> <button type="button" id="close-items-modal-btn"
+                        class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
+                        Cerrar </button>
+                </div>
+            </div>
+        </div><!-- Add Provider Modal -->
+        <div id="add-provider-modal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div
+                class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden">
+                <!-- Modal Header -->
+                <div
+                    class="bg-gradient-to-r from-emerald-500 to-green-600 p-6 flex items-center justify-between shrink-0">
+                    <h2 class="text-2xl font-bold text-white">Nuevo Proveedor</h2><button type="button"
+                        id="close-add-provider-btn" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg></button>
+                </div><!-- Modal Content -->
+                <div class="p-6 space-y-4 overflow-y-auto flex-1">
+                    <div><label class="block text-slate-300 text-sm font-medium mb-2">Nombre del Proveedor</label>
+                        <input type="text" id="provider-name-input" placeholder="Ej: Frutas Frescas"
+                            class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    </div>
+                    <div><label class="block text-slate-300 text-sm font-medium mb-2">Emoji del Proveedor</label>
+                        <div class="grid grid-cols-6 gap-2"><button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🥬">🥬</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🥩">🥩</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🧀">🧀</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🛒">🛒</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🍎">🍎</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🌶️">🌶️</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🍞">🍞</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🥚">🥚</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🥫">🥫</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="📦">📦</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="🚚">🚚</button> <button type="button"
+                                class="emoji-btn p-3 bg-slate-600 hover:bg-slate-500 rounded-lg text-2xl transition"
+                                data-emoji="⭐">⭐</button>
+                        </div><input type="hidden" id="provider-emoji-input" value="🥬">
+                    </div>
+                    <div><label class="block text-slate-300 text-sm font-medium mb-2">Color del Proveedor</label>
+                        <select id="provider-color-input"
+                            class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                            <option value="from-green-500 to-emerald-600">Verde - Frutas y Verduras</option>
+                            <option value="from-red-500 to-rose-600">Rojo - Carnes</option>
+                            <option value="from-yellow-500 to-amber-600">Amarillo - Lácteos</option>
+                            <option value="from-blue-500 to-indigo-600">Azul - Abarrotes</option>
+                            <option value="from-purple-500 to-violet-600">Púrpura - Bebidas</option>
+                            <option value="from-pink-500 to-rose-600">Rosa - Postres</option>
+                            <option value="from-orange-500 to-amber-600">Naranja - Panadería</option>
+                            <option value="from-cyan-500 to-blue-600">Cyan - Congelados</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-slate-300 text-sm font-medium mb-2">Nombre de Contacto</label>
+                            <input type="text" id="provider-contact-input" placeholder="Ej: Juan Pérez"
+                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 text-sm font-medium mb-2">Teléfono</label>
+                            <input type="tel" id="provider-phone-input" placeholder="Ej: 55 1234 5678"
+                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-2">Método de Pago
+                            Preferido</label>
+                        <select id="provider-payment-input"
+                            class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Link de Pago">Link de Pago</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-slate-300 text-sm font-medium mb-2">Banco</label>
+                            <input type="text" id="provider-bank-input" placeholder="Ej: BBVA"
+                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 text-sm font-medium mb-2">No. Cuenta / CLABE</label>
+                            <input type="text" id="provider-account-input" placeholder="0123456789"
+                                class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div><!-- Modal Footer -->
+                <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900"><button type="button"
+                        id="cancel-add-provider-btn"
+                        class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
+                        Cancelar </button> <button type="button" id="save-add-provider-btn"
+                        class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">
+                        Crear Proveedor </button>
+                </div>
+            </div>
+        </div>
+        <!-- Edit Order Modal -->
+        <div id="edit-order-modal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div
+                class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+                <div class="bg-gradient-to-r from-purple-500 to-indigo-600 p-6 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Editar Orden</h2>
+                        <p id="edit-order-subtitle" class="text-purple-100 text-sm">Proveedor: --</p>
+                    </div>
+                    <button type="button" id="close-edit-order-btn"
+                        class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="edit-order-content" class="overflow-y-auto flex-1 p-6 space-y-4">
+                    <!-- Items -->
+                </div>
+                <div class="border-t border-slate-700 p-6 flex items-center justify-between bg-slate-900 gap-4">
+                    <!-- Add Product UI -->
+                    <div id="add-to-order-container" class="flex-1 hidden">
+                        <div class="flex gap-2">
+                            <select id="add-item-to-order-select"
+                                class="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <!-- Options via JS -->
+                            </select>
+                            <button type="button" id="confirm-add-item-btn"
+                                class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition">Añadir</button>
+                            <button type="button" id="cancel-add-item-btn"
+                                class="bg-slate-700 hover:bg-slate-600 text-slate-400 px-3 py-2 rounded-lg transition">✕</button>
+                        </div>
+                    </div>
+
+                    <button type="button" id="show-add-item-btn"
+                        class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-purple-400 font-bold transition flex items-center gap-2 whitespace-nowrap">
+                        <span>➕</span> Añadir Producto
+                    </button>
+
+                    <div class="flex gap-3">
+                        <button type="button" id="cancel-edit-order-btn"
+                            class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">Cancelar</button>
+                        <button type="button" id="save-edit-order-btn"
+                            class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">Guardar
+                            Cambios</button>
                     </div>
                 </div>
             </div>
+        </div>
+        <!-- Finance Modal -->
+        <div id="finance-modal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div
+                class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col">
+                <div class="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Solicitud de Pago</h2>
+                        <p class="text-blue-100 text-sm">Para Finanzas</p>
+                    </div>
+                    <button type="button" id="close-finance-modal-btn"
+                        class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Fecha Máxima de Pago</label>
+                            <input type="date" id="finance-payment-date"
+                                class="w-full bg-slate-700 text-white rounded-lg p-2 text-sm border border-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Fecha Aprox. Recepción</label>
+                            <input type="date" id="finance-delivery-date"
+                                class="w-full bg-slate-700 text-white rounded-lg p-2 text-sm border border-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-lg font-mono text-sm text-slate-300 select-all"
+                        id="finance-request-text">
+                        <!-- Request Text -->
+                    </div>
+                    <p class="text-xs text-slate-500 text-center">Selecciona las fechas y copia el texto para
+                        Finanzas.
+                    </p>
+                </div>
+                <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900 shrink-0">
+                    <button type="button" id="mark-requested-btn"
+                        class="px-6 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-500 text-white font-medium transition">Marcar
+                        como Solicitado</button>
+                    <button type="button" id="copy-finance-btn"
+                        class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition">Copiar
+                        Texto</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Resumen Final (Moved to Top Level) -->
+        <div id="summary-screen"
+            class="hidden min-h-full bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 py-8 px-4 flex flex-col items-center justify-center">
+            <div class="max-w-2xl w-full space-y-6 animate-in"><!-- Checkmark animado -->
+                <div class="flex justify-center">
+                    <div
+                        class="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-2xl">
+                        <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                </div><!-- Título -->
+                <div class="text-center">
+                    <h1 class="text-4xl font-bold text-white mb-2">¡Inventario Completado!</h1>
+                    <p class="text-slate-300 text-lg">Resumen de tu captura</p>
+                </div><!-- Información de Tiempos -->
+                <div class="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700 space-y-4">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-600"><span
+                            class="text-slate-400 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg> Hora de Inicio </span> <span id="summary-start-time"
+                            class="text-white font-semibold">--:-- AM</span>
+                    </div>
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-600"><span
+                            class="text-slate-400 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg> Hora de Finalización </span> <span id="summary-end-time"
+                            class="text-white font-semibold">--:-- AM</span>
+                    </div>
+                    <div class="flex items-center justify-between"><span class="text-slate-400 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg> Duración Total </span> <span id="summary-duration"
+                            class="text-white font-semibold text-lg">00:00:00</span>
+                    </div>
+                </div><!-- Estadísticas -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-700/50 rounded-lg p-4 text-center border border-slate-600">
+                        <div class="text-2xl font-bold text-emerald-400" id="total-providers">
+                            0
+                        </div>
+                        <p class="text-slate-400 text-sm mt-2">Proveedores</p>
+                    </div>
+                    <div class="bg-slate-700/50 rounded-lg p-4 text-center border border-slate-600">
+                        <div class="text-2xl font-bold text-blue-400" id="total-items">
+                            0
+                        </div>
+                        <p class="text-slate-400 text-sm mt-2">Insumos</p>
+                    </div>
+                </div><!-- Botones de Acción -->
+                <div class="space-y-3 pt-4"><button type="button" id="download-summary-btn"
+                        class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition inline-flex items-center justify-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg> Descargar Excel </button> <button type="button" id="new-inventory-btn"
+                        class="w-full bg-blue-500 hover:bg-blue-400 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition inline-flex items-center justify-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg> Nuevo Inventario </button> <button type="button" id="back-to-start-btn"
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition">
+                        Volver al Inicio </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Inicio de Órdenes (Moved to Top Level) -->
+        <div id="purchase-home-screen"
+            class="hidden min-h-full bg-gradient-to-br from-slate-900 via-slate-800 to-purple-900 py-8 px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-8 flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white flex items-center gap-3 mb-2">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg> Órdenes de Compra
+                        </h1>
+                        <p class="text-slate-400">Genera y gestiona tus pedidos a proveedores</p>
+                    </div><button id="back-from-purchase-btn"
+                        class="px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition">
+                        ← Volver </button>
+                </div>
+                <!-- Botón Principal -->
+                <button id="new-purchase-order-btn"
+                    class="w-full mb-8 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white font-bold py-4 px-6 rounded-xl shadow-xl transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg> Nueva Orden de Compra
+                </button>
+
+                <!-- Historial de Órdenes -->
+                <h2 class="text-xl font-bold text-white mb-4">Últimas Órdenes Generadas</h2>
+                <div id="purchase-history-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Orders will be rendered here -->
+                </div>
+                <div id="purchase-history-empty"
+                    class="flex flex-col items-center justify-center py-10 bg-slate-800/30 rounded-xl">
+                    <p class="text-slate-400">No hay órdenes registradas aún</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Configuración de Orden (Moved to Top Level) -->
+        <div id="purchase-setup-screen"
+            class="hidden min-h-full bg-slate-900 py-8 px-4 flex items-center justify-center">
+            <div class="max-w-md w-full bg-slate-800 rounded-2xl p-6 shadow-2xl animate-in">
+                <h2 class="text-2xl font-bold text-white mb-6">Configurar Nueva Orden</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-2">Solicitante</label>
+                        <input type="text" id="purchase-requester-input"
+                            class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-2">Inventario Base</label>
+                        <select id="purchase-inventory-select"
+                            class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <!-- Options rendered via JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-2">Observaciones Generales</label>
+                        <textarea id="purchase-notes-input" rows="3"
+                            class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="Ej: Entrega urgente antes del viernes..."></textarea>
+                    </div>
+                </div>
+                <div class="mt-8 flex gap-3">
+                    <button id="cancel-purchase-setup-btn"
+                        class="flex-1 px-4 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
+                        Cancelar </button>
+                    <button id="generate-purchase-btn"
+                        class="flex-1 px-4 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold transition">
+                        Generar Órdenes </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Vista Previa de Órdenes (Moved to Top Level) -->
+        <div id="purchase-preview-screen"
+            class="hidden min-h-full bg-gradient-to-br from-slate-900 via-slate-800 to-purple-900 py-8 px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="mb-8 flex items-center justify-between">
+                    <h1 class="text-2xl font-bold text-white">Vista Previa de Órdenes</h1>
+                    <button id="close-purchase-preview-btn"
+                        class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium transition">
+                        Cerrar </button>
+                </div>
+                <div id="purchase-orders-container" class="space-y-6">
+                    <!-- Order cards per provider -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Monitor de Compras (Moved to Top Level) -->
+        <div id="monitor-screen"
+            class="hidden min-h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-8 flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white flex items-center gap-3 mb-2">
+                            <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg> Monitor de Compras
+                        </h1>
+                        <p class="text-slate-400">Seguimiento de estados por proveedor</p>
+                    </div>
+                    <button id="back-from-monitor-btn"
+                        class="px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition">
+                        ← Volver </button>
+                </div>
+
+                <div id="monitor-content" class="space-y-8">
+                    <!-- Workflow columns or status rows will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- User Name Modal (Moved to Top Level) -->
+        <div id="user-name-modal"
+            class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div class="modal-content bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full"><!-- Modal Header -->
+                <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-white">Información del Operario</h2>
+                </div><!-- Modal Content -->
+                <div class="p-6 space-y-4">
+                    <div><label class="block text-slate-300 text-sm font-medium mb-2">¿Quién realiza el
+                            inventario?</label>
+                        <input type="text" id="user-name-input" placeholder="Ingresa tu nombre completo"
+                            class="w-full bg-slate-600 border border-slate-500 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            autocomplete="off">
+                    </div>
+                </div><!-- Modal Footer -->
+                <div class="border-t border-slate-700 p-6 flex gap-3 justify-end bg-slate-900">
+                    <button type="button" id="cancel-user-name-btn"
+                        class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
+                        Cancelar </button>
+                    <button type="button" id="confirm-user-name-btn"
+                        class="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition">
+                        Continuar </button>
+                </div>
+            </div>
+        </div>
+        <!-- Fixed Finish Button Container -->
+        <div id="fixed-finish-container"
+            class="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent flex justify-center z-50 transition-all duration-500 translate-y-full opacity-0 pointer-events-none">
+            <button type="button" id="finish-inventory-btn-fixed"
+                class="w-full max-w-md inline-flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl shadow-emerald-500/20 transition transform hover:scale-105 active:scale-95 text-xl">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg> FINALIZAR INVENTARIO </button>
         </div>
         <script>
             // State
@@ -1234,7 +1244,11 @@
             let inventoryHistory = [];
             let isAuthenticated = false;
             let currentPin = "";
-            const CORRECT_PIN = "1234"; // Default PIN
+            const AUTHORIZED_USERS = {
+                "1212": "David",
+                "2323": "Evelyn",
+                "3030": "Verónica"
+            };
             let isSyncing = false;
 
             const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycby6b_dDBnO5LlFAYtgG4StJfOuiy6V1j0uiYoZz2NQXWfmNT4wjYOzWBwZKBxa8-vNG/exec';
@@ -1327,17 +1341,23 @@
             async function loadData(isBackground = false) {
                 if (isSyncing) return;
                 isSyncing = true;
+                console.log("Loading data...", isBackground ? "(Background)" : "(Initial)");
 
                 if (!isBackground) {
                     // Initial load from LocalStorage
-                    const savedProviders = localStorage.getItem('providers');
-                    if (savedProviders) providers = JSON.parse(savedProviders);
+                    try {
+                        const savedProviders = localStorage.getItem('providers');
+                        if (savedProviders) providers = JSON.parse(savedProviders);
 
-                    const savedPurchaseHistory = localStorage.getItem('purchaseHistory');
-                    if (savedPurchaseHistory) purchaseHistory = JSON.parse(savedPurchaseHistory);
+                        const savedPurchaseHistory = localStorage.getItem('purchaseHistory');
+                        if (savedPurchaseHistory) purchaseHistory = JSON.parse(savedPurchaseHistory);
 
-                    const savedInventoryHistory = localStorage.getItem('inventoryHistory');
-                    if (savedInventoryHistory) inventoryHistory = JSON.parse(savedInventoryHistory);
+                        const savedInventoryHistory = localStorage.getItem('inventoryHistory');
+                        if (savedInventoryHistory) inventoryHistory = JSON.parse(savedInventoryHistory);
+                        console.log("Local storage loaded.");
+                    } catch (e) {
+                        console.error("Error reading from local storage:", e);
+                    }
                 }
 
                 const syncIcon = document.getElementById('sync-icon-svg');
@@ -1346,11 +1366,11 @@
                 try {
                     updateSyncStatus('syncing');
                     const remote = await sheetsAPI.getAll();
+                    console.log("Remote data fetched:", remote);
 
                     let changed = false;
 
                     if (remote.providers) {
-                        // Providers ARE the source of truth (to allow deletions)
                         if (JSON.stringify(providers) !== JSON.stringify(remote.providers)) {
                             providers = remote.providers;
                             localStorage.setItem('providers', JSON.stringify(providers));
@@ -1359,7 +1379,6 @@
                     }
 
                     if (remote.orders) {
-                        // Purchase history: Smart Merge
                         const mergedOrders = mergeArrays(purchaseHistory, remote.orders);
                         if (JSON.stringify(purchaseHistory) !== JSON.stringify(mergedOrders)) {
                             purchaseHistory = mergedOrders;
@@ -1369,7 +1388,6 @@
                     }
 
                     if (remote.inventories) {
-                        // Inventory history: Smart Merge
                         const mergedInvs = mergeArrays(inventoryHistory, remote.inventories);
                         if (JSON.stringify(inventoryHistory) !== JSON.stringify(mergedInvs)) {
                             inventoryHistory = mergedInvs;
@@ -1379,9 +1397,10 @@
                     }
 
                     if (changed) {
+                        console.log("Data changed after sync, re-rendering UI components.");
                         if (!document.getElementById('start-screen').classList.contains('hidden')) {
                             renderPurchaseHistory();
-                            renderHistory(); // This is the inventory history function
+                            renderHistory();
                         }
                         if (!document.getElementById('settings-modal').classList.contains('hidden')) {
                             renderProvidersSettings();
@@ -1399,22 +1418,27 @@
             }
 
             async function saveData() {
-                // Local save
-                localStorage.setItem('providers', JSON.stringify(providers));
-                localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
-                localStorage.setItem('inventoryHistory', JSON.stringify(inventoryHistory));
+                console.log("Saving data to local storage and remote...");
+                try {
+                    localStorage.setItem('providers', JSON.stringify(providers));
+                    localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+                    localStorage.setItem('inventoryHistory', JSON.stringify(inventoryHistory));
+                } catch (e) {
+                    console.error("Local save failed:", e);
+                }
 
-                // Remote sync (debounced or background)
                 try {
                     updateSyncStatus('syncing');
                     await Promise.all([
                         sheetsAPI.saveProviders(providers),
-                        sheetsAPI.saveOrders(purchaseHistory),
-                        sheetsAPI.saveInventories(inventoryHistory)
+                        sheetsAPI.saveInventories(inventoryHistory),
+                        sheetsAPI.saveOrders(purchaseHistory)
                     ]);
+                    console.log("Remote save successful.");
                     updateSyncStatus('success');
-                } catch (e) {
+                } catch (err) {
                     updateSyncStatus('error');
+                    console.error("Remote save failed:", err);
                 }
             }
 
@@ -1443,7 +1467,9 @@
             }
 
             async function verifyPin() {
-                if (currentPin === CORRECT_PIN) {
+                const userName = AUTHORIZED_USERS[currentPin];
+                if (userName) {
+                    currentUserName = userName; // Set the global currentUserName
                     unlockApp();
                 } else {
                     const display = document.getElementById('pin-display');
@@ -1513,32 +1539,333 @@
                 });
 
                 // Logout Event Listener
-                document.getElementById('logout-btn').addEventListener('click', () => {
-                    showConfirm("Cerrar Sesión", "¿Quieres bloquear la aplicación ahora?", () => {
-                        logout();
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', () => {
+                        showConfirm("Cerrar Sesión", "¿Quieres bloquear la aplicación ahora?", () => {
+                            logout();
+                        });
                     });
-                });
+                }
 
                 // Manual Sync
-                document.getElementById('manual-sync-btn').addEventListener('click', () => {
-                    loadData(true);
-                });
+                const syncBtn = document.getElementById('manual-sync-btn');
+                if (syncBtn) {
+                    syncBtn.addEventListener('click', () => {
+                        loadData(true);
+                    });
+                }
 
-                // Automatic Polling (every 60 seconds)
-                setInterval(() => {
-                    if (isAuthenticated) loadData(true);
-                }, 60000);
+                // Confirmation Modal Listeners
+                const confirmBtn = document.getElementById('confirm-action-btn');
+                const cancelBtn = document.getElementById('confirm-cancel-btn');
+                if (confirmBtn) {
+                    confirmBtn.addEventListener('click', () => {
+                        console.log("Confirmation button clicked. Executing callback.");
+                        if (currentConfirmCallback) {
+                            currentConfirmCallback();
+                        }
+                        closeConfirmModal();
+                    });
+                }
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => {
+                        console.log("Confirmation cancel clicked.");
+                        closeConfirmModal();
+                    });
+                }
 
-                // Physical keyboard support
-                window.addEventListener('keydown', (e) => {
-                    if (document.getElementById('lock-screen').classList.contains('hidden')) return;
+                // Start Inventory Button
+                const startInvBtn = document.getElementById('start-inventory-btn');
+                if (startInvBtn) {
+                    startInvBtn.addEventListener('click', () => {
+                        showUserNameModal();
+                    });
+                }
 
-                    if (e.key >= '0' && e.key <= '9') {
-                        handleKeypad(e.key);
-                    } else if (e.key === 'Backspace') {
-                        handleKeypad('back');
-                    }
-                });
+                // Finish Inventory
+                const finishInvBtn = document.getElementById('finish-inventory-btn');
+                if (finishInvBtn) {
+                    finishInvBtn.addEventListener('click', () => {
+                        showConfirm("Finalizar Inventario", "¿Estás seguro de finalizar el inventario?", () => {
+                            finishInventory();
+                        });
+                    });
+                }
+
+                const finishInvBtnFixed = document.getElementById('finish-inventory-btn-fixed');
+                if (finishInvBtnFixed) {
+                    finishInvBtnFixed.addEventListener('click', () => {
+                        showConfirm("Finalizar Inventario", "¿Estás seguro de finalizar el inventario?", () => {
+                            finishInventory();
+                        });
+                    });
+                }
+
+                // Cancel Inventory
+                const cancelInvBtn = document.getElementById('cancel-inventory-btn');
+                if (cancelInvBtn) {
+                    cancelInvBtn.addEventListener('click', () => {
+                        showConfirm("Cancelar Inventario", "¿Estás seguro de cancelar? Se perderán los datos.", () => {
+                            clearInterval(timerInterval);
+                            isTimerRunning = false;
+                            document.getElementById('finish-inventory-btn-fixed').classList.add('hidden');
+                            document.getElementById('capture-screen').classList.add('hidden');
+                            document.getElementById('start-screen').classList.remove('hidden');
+                        });
+                    });
+                }
+
+                // Pause/Resume
+                const pauseResumeBtn = document.getElementById('pause-resume-btn');
+                if (pauseResumeBtn) {
+                    pauseResumeBtn.addEventListener('click', () => {
+                        const pauseText = document.getElementById('pause-text');
+                        if (isTimerRunning) {
+                            isTimerRunning = false;
+                            clearInterval(timerInterval);
+                            pausedStartTime = new Date();
+                            pauseResumeBtn.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> <span id="pause-text">Reanudar</span>`;
+                            pauseResumeBtn.classList.replace('bg-blue-600', 'bg-emerald-600');
+                        } else {
+                            isTimerRunning = true;
+                            if (pausedStartTime) pausedTime += (new Date() - pausedStartTime);
+                            pausedStartTime = null;
+                            timerInterval = setInterval(updateTimer, 1000);
+                            pauseResumeBtn.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg> <span id="pause-text">Pausar</span>`;
+                            pauseResumeBtn.classList.replace('bg-emerald-600', 'bg-blue-600');
+                        }
+                    });
+                }
+
+                // Monitor de Compras Logic
+                const monitorBtnStart = document.getElementById('monitor-btn-start');
+                if (monitorBtnStart) {
+                    monitorBtnStart.addEventListener('click', () => {
+                        renderMonitor();
+                        document.getElementById('start-screen').classList.add('hidden');
+                        document.getElementById('monitor-screen').classList.remove('hidden');
+                    });
+                }
+
+                const backFromMonitorBtn = document.getElementById('back-from-monitor-btn');
+                if (backFromMonitorBtn) {
+                    backFromMonitorBtn.addEventListener('click', () => {
+                        document.getElementById('monitor-screen').classList.add('hidden');
+                        document.getElementById('start-screen').classList.remove('hidden');
+                    });
+                }
+
+                // User Name Modal Listeners
+                const cancelUserNameBtn = document.getElementById('cancel-user-name-btn');
+                if (cancelUserNameBtn) {
+                    cancelUserNameBtn.addEventListener('click', () => {
+                        document.getElementById('user-name-modal').classList.add('hidden');
+                    });
+                }
+
+                const confirmUserNameBtn = document.getElementById('confirm-user-name-btn');
+                if (confirmUserNameBtn) {
+                    confirmUserNameBtn.addEventListener('click', () => {
+                        const name = document.getElementById('user-name-input').value.trim();
+                        if (!name) { alert("Por favor ingresa tu nombre"); return; }
+                        currentUserName = name;
+                        document.getElementById('user-name-modal').classList.add('hidden');
+                        startInventory();
+                    });
+                }
+
+                // History Event Listeners
+                const historyBtn = document.getElementById('history-btn');
+                if (historyBtn) {
+                    historyBtn.addEventListener('click', () => {
+                        renderHistory();
+                        document.getElementById('start-screen').classList.add('hidden');
+                        document.getElementById('history-screen').classList.remove('hidden');
+                    });
+                }
+
+                const backFromHistoryBtn = document.getElementById('back-from-history-btn');
+                if (backFromHistoryBtn) {
+                    backFromHistoryBtn.addEventListener('click', () => {
+                        document.getElementById('history-screen').classList.add('hidden');
+                        document.getElementById('start-screen').classList.remove('hidden');
+                    });
+                }
+
+                const historyList = document.getElementById('history-list');
+                if (historyList) {
+                    historyList.addEventListener('click', (e) => {
+                        const card = e.target.closest('.history-card');
+                        if (card) {
+                            const index = card.dataset.index;
+                            const history = JSON.parse(localStorage.getItem('inventoryHistory') || '[]');
+                            if (history[index]) {
+                                showDetail(history[index]);
+                            }
+                        }
+                    });
+                }
+
+                const closeDetailBtn = document.getElementById('close-detail-modal-btn');
+                if (closeDetailBtn) {
+                    closeDetailBtn.addEventListener('click', () => document.getElementById('inventory-detail-modal').classList.add('hidden'));
+                }
+
+                const newInventoryBtn = document.getElementById('new-inventory-btn');
+                if (newInventoryBtn) {
+                    newInventoryBtn.addEventListener('click', () => {
+                        document.getElementById('summary-screen').classList.add('hidden');
+                        showUserNameModal();
+                    });
+                }
+
+                const backToStartBtn = document.getElementById('back-to-start-btn');
+                if (backToStartBtn) {
+                    backToStartBtn.addEventListener('click', () => {
+                        document.getElementById('summary-screen').classList.add('hidden');
+                        document.getElementById('start-screen').classList.remove('hidden');
+                    });
+                }
+
+                // Settings & Modals
+                const settingsBtnStart = document.getElementById('settings-btn-start');
+                if (settingsBtnStart) {
+                    settingsBtnStart.addEventListener('click', () => {
+                        console.log("Opening Settings Modal");
+                        renderProvidersSettings();
+                        document.getElementById('settings-modal').classList.remove('hidden');
+                    });
+                }
+                const closeSettingsBtn = document.getElementById('close-settings-btn');
+                if (closeSettingsBtn) {
+                    closeSettingsBtn.addEventListener('click', () => document.getElementById('settings-modal').classList.add('hidden'));
+                }
+                const closeSettingsModalBtn = document.getElementById('close-settings-modal-btn');
+                if (closeSettingsModalBtn) {
+                    closeSettingsModalBtn.addEventListener('click', () => document.getElementById('settings-modal').classList.add('hidden'));
+                }
+
+                // Purchase Order Event Listeners
+                const purchaseBtnStart = document.getElementById('purchase-btn-start');
+                if (purchaseBtnStart) {
+                    purchaseBtnStart.addEventListener('click', () => {
+                        loadData();
+                        renderPurchaseHistory();
+                        document.getElementById('start-screen').classList.add('hidden');
+                        document.getElementById('purchase-home-screen').classList.remove('hidden');
+                    });
+                }
+
+                const backFromPurchaseBtn = document.getElementById('back-from-purchase-btn');
+                if (backFromPurchaseBtn) {
+                    backFromPurchaseBtn.addEventListener('click', () => {
+                        document.getElementById('start-screen').classList.remove('hidden');
+                        document.getElementById('purchase-home-screen').classList.add('hidden');
+                    });
+                }
+
+                const newPurchaseOrderBtn = document.getElementById('new-purchase-order-btn');
+                if (newPurchaseOrderBtn) {
+                    newPurchaseOrderBtn.addEventListener('click', () => {
+                        document.getElementById('purchase-requester-input').value = currentUserName || '';
+                        const select = document.getElementById('purchase-inventory-select');
+                        select.innerHTML = '';
+                        const inventories = JSON.parse(localStorage.getItem('inventoryHistory') || '[]');
+                        if (inventories.length === 0) {
+                            const opt = document.createElement('option');
+                            opt.text = "No hay inventarios disponibles";
+                            select.add(opt);
+                            select.disabled = true;
+                        } else {
+                            select.disabled = false;
+                            const latestOpt = document.createElement('option');
+                            latestOpt.value = 'latest';
+                            latestOpt.text = `Último Inventario (${inventories[0].date} - ${inventories[0].userName})`;
+                            select.add(latestOpt);
+                            inventories.forEach(inv => {
+                                const opt = document.createElement('option');
+                                opt.value = inv.id;
+                                opt.text = `${inv.date} - ${inv.userName}`;
+                                select.add(opt);
+                            });
+                        }
+                        document.getElementById('purchase-home-screen').classList.add('hidden');
+                        document.getElementById('purchase-setup-screen').classList.remove('hidden');
+                    });
+                }
+
+                const cancelPurchaseSetupBtn = document.getElementById('cancel-purchase-setup-btn');
+                if (cancelPurchaseSetupBtn) {
+                    cancelPurchaseSetupBtn.addEventListener('click', () => {
+                        document.getElementById('purchase-setup-screen').classList.add('hidden');
+                        document.getElementById('purchase-home-screen').classList.remove('hidden');
+                    });
+                }
+
+                const closePurchasePreviewBtn = document.getElementById('close-purchase-preview-btn');
+                if (closePurchasePreviewBtn) {
+                    closePurchasePreviewBtn.addEventListener('click', () => {
+                        document.getElementById('purchase-preview-screen').classList.add('hidden');
+                        document.getElementById('purchase-home-screen').classList.remove('hidden');
+                    });
+                }
+
+                const purchaseOrdersContainer = document.getElementById('purchase-orders-container');
+                if (purchaseOrdersContainer) {
+                    purchaseOrdersContainer.addEventListener('click', (e) => {
+                        const btn = e.target.closest('button');
+                        if (!btn) return;
+
+                        const providerName = btn.dataset.provider;
+                        if (!providerName) return;
+
+                        if (btn.classList.contains('edit-order-btn')) openEditOrderModal(providerName);
+                        else if (btn.classList.contains('pdf-btn')) {
+                            const items = currentViewingOrder.orders[providerName];
+                            generatePDF(providerName, items, currentViewingOrder);
+                        }
+                        else if (btn.classList.contains('whatsapp-btn')) {
+                            const items = currentViewingOrder.orders[providerName];
+                            sendWhatsApp(providerName, items, currentViewingOrder);
+                        }
+                        else if (btn.classList.contains('email-btn')) {
+                            const items = currentViewingOrder.orders[providerName];
+                            sendEmail(providerName, items, currentViewingOrder);
+                        }
+                        else if (btn.classList.contains('finance-btn')) openFinanceModal(providerName);
+                        else if (btn.classList.contains('paid-btn')) updateOrderStatus(providerName, 'PAGADA');
+                    });
+                }
+
+                const purchaseHistoryList = document.getElementById('purchase-history-list');
+                if (purchaseHistoryList) {
+                    purchaseHistoryList.addEventListener('click', (e) => {
+                        const card = e.target.closest('.purchase-history-card');
+                        if (card) {
+                            const index = card.dataset.index;
+                            const order = purchaseHistory[index];
+                            if (order) {
+                                renderPurchasePreview(order);
+                                document.getElementById('purchase-home-screen').classList.add('hidden');
+                                document.getElementById('purchase-preview-screen').classList.remove('hidden');
+                            }
+                        }
+                    });
+                }
+
+                const closeItemsBtn = document.getElementById('close-items-btn');
+                if (closeItemsBtn) {
+                    closeItemsBtn.addEventListener('click', () => document.getElementById('items-modal').classList.add('hidden'));
+                }
+                const closeItemsModalBtn = document.getElementById('close-items-modal-btn');
+                if (closeItemsModalBtn) {
+                    closeItemsModalBtn.addEventListener('click', () => document.getElementById('items-modal').classList.add('hidden'));
+                }
+
+                // Initial Data Load
+                console.log("App Initialized. Loading data...");
+                loadData();
             });
 
             // Timer
@@ -1560,17 +1887,6 @@
                 setTimeout(() => document.getElementById('user-name-input').focus(), 100);
             }
 
-            document.getElementById('cancel-user-name-btn').addEventListener('click', () => {
-                document.getElementById('user-name-modal').classList.add('hidden');
-            });
-
-            document.getElementById('confirm-user-name-btn').addEventListener('click', () => {
-                const name = document.getElementById('user-name-input').value.trim();
-                if (!name) { alert("Por favor ingresa tu nombre"); return; }
-                currentUserName = name;
-                document.getElementById('user-name-modal').classList.add('hidden');
-                startInventory();
-            });
 
             // Inventory Flow
             function startInventory() {
@@ -1579,18 +1895,28 @@
                 isTimerRunning = true;
                 timerInterval = setInterval(updateTimer, 1000);
 
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('capture-screen').classList.remove('hidden');
+
                 document.getElementById('user-info-display').textContent = `Usuario: ${currentUserName}`;
                 document.getElementById('start-time-display').textContent = `Inicio: ${inventoryStartTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
-                renderCaptureForm();
-
-                document.getElementById('start-screen').classList.add('hidden');
-                document.getElementById('capture-screen').classList.remove('hidden');
+                try {
+                    renderCaptureForm();
+                } catch (e) {
+                    console.error("Error rendering capture form:", e);
+                }
             }
 
             function renderCaptureForm() {
                 const form = document.getElementById('inventory-form-capture');
                 form.innerHTML = '';
+
+                console.log("Rendering capture form for providers:", providers);
+                if (!providers || providers.length === 0) {
+                    form.innerHTML = '<p class="text-slate-400 text-center py-10">No hay proveedores cargados. Revisa la conexión.</p>';
+                    return;
+                }
 
                 providers.forEach((provider, pIndex) => {
                     const section = document.createElement('div');
@@ -1705,10 +2031,23 @@
             `;
                 form.appendChild(footer);
 
-                // Re-bind click event to the new button
+                // Show fixed finish button
+                const fixedContainer = document.getElementById('fixed-finish-container');
+                fixedContainer.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+
+                // Re-bind click event to the fixed button too
+                document.getElementById('finish-inventory-btn-fixed').onclick = () => {
+                    showConfirm("Finalizar Inventario", "¿Estás seguro de finalizar el inventario?", () => {
+                        finishInventory();
+                        fixedContainer.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+                    });
+                };
+
+                // Re-bind click event to the footer button
                 document.getElementById('finish-inventory-btn-footer').addEventListener('click', () => {
                     showConfirm("Finalizar Inventario", "¿Estás seguro de finalizar el inventario?", () => {
                         finishInventory();
+                        fixedContainer.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
                     });
                 });
             }
@@ -1723,41 +2062,6 @@
                 input.dispatchEvent(new Event('change'));
             };
 
-            // Finish Inventory
-            document.getElementById('finish-inventory-btn').addEventListener('click', () => {
-                showConfirm("Finalizar Inventario", "¿Estás seguro de finalizar el inventario?", () => {
-                    finishInventory();
-                });
-            });
-
-            // Cancel Inventory
-            document.getElementById('cancel-inventory-btn').addEventListener('click', () => {
-                showConfirm("Cancelar Inventario", "¿Estás seguro de cancelar? Se perderán los datos.", () => {
-                    clearInterval(timerInterval);
-                    isTimerRunning = false;
-                    document.getElementById('capture-screen').classList.add('hidden');
-                    document.getElementById('start-screen').classList.remove('hidden');
-                });
-            });
-
-            // Pause/Resume
-            document.getElementById('pause-resume-btn').addEventListener('click', () => {
-                const pauseText = document.getElementById('pause-text');
-                if (isTimerRunning) {
-                    isTimerRunning = false;
-                    clearInterval(timerInterval);
-                    pausedStartTime = new Date();
-                    document.getElementById('pause-resume-btn').innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> <span id="pause-text">Reanudar</span>`;
-                    document.getElementById('pause-resume-btn').classList.replace('bg-blue-600', 'bg-emerald-600');
-                } else {
-                    isTimerRunning = true;
-                    if (pausedStartTime) pausedTime += (new Date() - pausedStartTime);
-                    pausedStartTime = null;
-                    timerInterval = setInterval(updateTimer, 1000);
-                    document.getElementById('pause-resume-btn').innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg> <span id="pause-text">Pausar</span>`;
-                    document.getElementById('pause-resume-btn').classList.replace('bg-emerald-600', 'bg-blue-600');
-                }
-            });
 
             function finishInventory() {
                 clearInterval(timerInterval);
@@ -1807,6 +2111,7 @@
 
             function showSummary(record) {
                 document.getElementById('capture-screen').classList.add('hidden');
+                document.getElementById('finish-inventory-btn-fixed').classList.add('hidden');
                 document.getElementById('summary-screen').classList.remove('hidden');
 
                 document.getElementById('summary-start-time').textContent = record.startTime;
@@ -1848,17 +2153,7 @@
                 XLSX.writeFile(wb, `Inventario_${record.date.replace(/\//g, '-')}_${record.userName}.xlsx`);
             }
 
-            // History
-            document.getElementById('history-btn').addEventListener('click', () => {
-                renderHistory();
-                document.getElementById('start-screen').classList.add('hidden');
-                document.getElementById('history-screen').classList.remove('hidden');
-            });
-
-            document.getElementById('back-from-history-btn').addEventListener('click', () => {
-                document.getElementById('history-screen').classList.add('hidden');
-                document.getElementById('start-screen').classList.remove('hidden');
-            });
+            // History Functions
 
             function renderHistory() {
                 const history = JSON.parse(localStorage.getItem('inventoryHistory') || '[]');
@@ -1875,9 +2170,10 @@
                 list.classList.remove('hidden');
                 empty.classList.add('hidden');
 
-                history.forEach(rec => {
+                history.forEach((rec, index) => {
                     const card = document.createElement('div');
                     card.className = "bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700 hover:border-emerald-500 history-card cursor-pointer";
+                    card.dataset.index = index;
                     card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
                         <div>
@@ -1891,7 +2187,6 @@
                         <span>${rec.data.length} items</span>
                     </div>
                 `;
-                    card.onclick = () => showDetail(rec);
                     list.appendChild(card);
                 });
             }
@@ -1942,26 +2237,10 @@
                 document.getElementById('inventory-detail-modal').classList.remove('hidden');
             }
 
-            document.getElementById('close-detail-modal-btn').onclick = () => document.getElementById('inventory-detail-modal').classList.add('hidden');
-            document.getElementById('close-detail-modal-btn-footer').onclick = () => document.getElementById('inventory-detail-modal').classList.add('hidden');
-
-            // Navigation Back logic
-            document.getElementById('new-inventory-btn').onclick = () => {
-                document.getElementById('summary-screen').classList.add('hidden');
-                showUserNameModal();
-            };
-            document.getElementById('back-to-start-btn').onclick = () => {
-                document.getElementById('summary-screen').classList.add('hidden');
-                document.getElementById('start-screen').classList.remove('hidden');
-            };
+            // Navigation Functions
 
             // Settings & Modals (Simplified for restoration, relying on IDs)
-            document.getElementById('settings-btn-start').onclick = () => {
-                renderProvidersSettings();
-                document.getElementById('settings-modal').classList.remove('hidden');
-            };
-            document.getElementById('close-settings-btn').onclick = () => document.getElementById('settings-modal').classList.add('hidden');
-            document.getElementById('close-settings-modal-btn').onclick = () => document.getElementById('settings-modal').classList.add('hidden');
+            // Settings logic
 
             function renderProvidersSettings() {
                 const content = document.getElementById('settings-content');
@@ -2172,57 +2451,7 @@
                 renderProvidersSettings();
             };
 
-            document.getElementById('close-items-btn').onclick = () => document.getElementById('items-modal').classList.add('hidden');
-            document.getElementById('close-items-modal-btn').onclick = () => document.getElementById('items-modal').classList.add('hidden');
-
-            // PURCHASE ORDER MODULE (NEW)
-            document.getElementById('purchase-btn-start').addEventListener('click', () => {
-                loadData();
-                renderPurchaseHistory();
-                document.getElementById('start-screen').classList.add('hidden');
-                document.getElementById('purchase-home-screen').classList.remove('hidden');
-            });
-
-            document.getElementById('back-from-purchase-btn').addEventListener('click', () => {
-                document.getElementById('start-screen').classList.remove('hidden');
-                document.getElementById('purchase-home-screen').classList.add('hidden');
-            });
-
-            document.getElementById('new-purchase-order-btn').addEventListener('click', () => {
-                document.getElementById('purchase-requester-input').value = currentUserName || '';
-                const select = document.getElementById('purchase-inventory-select');
-                select.innerHTML = '';
-
-                const inventories = JSON.parse(localStorage.getItem('inventoryHistory') || '[]');
-
-                if (inventories.length === 0) {
-                    const opt = document.createElement('option');
-                    opt.text = "No hay inventarios disponibles";
-                    select.add(opt);
-                    select.disabled = true;
-                } else {
-                    select.disabled = false;
-                    const latestOpt = document.createElement('option');
-                    latestOpt.value = 'latest';
-                    latestOpt.text = `Último Inventario (${inventories[0].date} - ${inventories[0].userName})`;
-                    select.add(latestOpt);
-
-                    inventories.forEach(inv => {
-                        const opt = document.createElement('option');
-                        opt.value = inv.id;
-                        opt.text = `${inv.date} - ${inv.userName}`;
-                        select.add(opt);
-                    });
-                }
-
-                document.getElementById('purchase-home-screen').classList.add('hidden');
-                document.getElementById('purchase-setup-screen').classList.remove('hidden');
-            });
-
-            document.getElementById('cancel-purchase-setup-btn').addEventListener('click', () => {
-                document.getElementById('purchase-setup-screen').classList.add('hidden');
-                document.getElementById('purchase-home-screen').classList.remove('hidden');
-            });
+            // Purchase Functions
 
             document.getElementById('generate-purchase-btn').addEventListener('click', () => {
                 const requester = document.getElementById('purchase-requester-input').value;
@@ -2330,7 +2559,7 @@
                             </div>
                         </div>
                         <div class="flex gap-2">
-                             <button class="edit-order-btn bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg transition" title="Editar Orden">✏️</button>
+                             <button class="edit-order-btn bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg transition" title="Editar Orden" data-provider="${providerName}">✏️</button>
                              <span class="bg-black/20 text-white px-3 py-1 rounded-full text-sm flex items-center">${items.length} items</span>
                         </div>
                     </div>
@@ -2344,12 +2573,12 @@
                         </div>
                         <div class="grid grid-cols-1 gap-3">
                              <div class="grid grid-cols-3 gap-3">
-                                <button class="pdf-btn bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs">📄 PDF</button>
-                                <button class="whatsapp-btn bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs">📱 WA</button>
-                                <button class="email-btn bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs">📧 Mail</button>
+                                <button class="pdf-btn bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs" data-provider="${providerName}">📄 PDF</button>
+                                <button class="whatsapp-btn bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs" data-provider="${providerName}">📱 WA</button>
+                                <button class="email-btn bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs" data-provider="${providerName}">📧 Mail</button>
                              </div>
-                             ${status !== 'PAGADA' ? `<button class="finance-btn bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition font-bold shadow-lg shadow-indigo-500/20">💸 Solicitar Pago a Finanzas</button>` : ''}
-                             ${status === 'SOLICITADO' ? `<button class="paid-btn bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition font-bold shadow-lg shadow-green-500/20">✅ Marcar como Pagado</button>` : ''}
+                             ${status !== 'PAGADA' ? `<button class="finance-btn bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition font-bold shadow-lg shadow-indigo-500/20" data-provider="${providerName}">💸 Solicitar Pago a Finanzas</button>` : ''}
+                             ${status === 'SOLICITADO' ? `<button class="paid-btn bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition font-bold shadow-lg shadow-green-500/20" data-provider="${providerName}">✅ Marcar como Pagado</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -2382,10 +2611,11 @@
                 list.style.display = 'grid';
                 empty.style.display = 'none';
 
-                purchaseHistory.forEach(order => {
+                purchaseHistory.forEach((order, index) => {
                     const count = Object.keys(order.orders).length;
                     const card = document.createElement('div');
-                    card.className = 'bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-purple-500 transition cursor-pointer';
+                    card.className = 'bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-purple-500 transition cursor-pointer purchase-history-card';
+                    card.dataset.index = index;
                     card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="font-bold text-white">Orden del ${order.date}</h3>
@@ -2393,11 +2623,6 @@
                     </div>
                     <p class="text-slate-400 text-sm mb-2">Solicita: ${order.requester}</p>
                 `;
-                    card.onclick = () => {
-                        renderPurchasePreview(order);
-                        document.getElementById('purchase-home-screen').classList.add('hidden');
-                        document.getElementById('purchase-preview-screen').classList.remove('hidden');
-                    };
                     list.appendChild(card);
                 });
             }
@@ -2673,36 +2898,19 @@
             const confirmModal = document.getElementById('confirmation-modal');
             const confirmTitle = document.getElementById('confirm-title');
             const confirmMessage = document.getElementById('confirm-message');
-            const confirmBtn = document.getElementById('confirm-action-btn');
-            const cancelBtn = document.getElementById('confirm-cancel-btn');
-            let currentConfirmCallback = null;
-
+            // Confirm modal core functions
             function showConfirm(title, message, callback) {
-                confirmTitle.textContent = title;
-                confirmMessage.textContent = message;
+                document.getElementById('confirm-title').textContent = title;
+                document.getElementById('confirm-message').textContent = message;
                 currentConfirmCallback = callback;
-                confirmModal.classList.remove('hidden');
+                document.getElementById('confirmation-modal').classList.remove('hidden');
             }
 
             function closeConfirmModal() {
-                confirmModal.classList.add('hidden');
+                document.getElementById('confirmation-modal').classList.add('hidden');
                 currentConfirmCallback = null;
             }
 
-            confirmBtn.onclick = () => {
-                if (currentConfirmCallback) currentConfirmCallback();
-                closeConfirmModal();
-            };
-
-            cancelBtn.onclick = closeConfirmModal;
-
-            // Start Inventory Button
-            document.getElementById('start-inventory-btn').addEventListener('click', () => {
-                showUserNameModal();
-            });
-
-            // Init
-            loadData();
             // Edit Order Logic
             let currentEditingOrder = null;
             let currentEditingProvider = null;
@@ -2926,16 +3134,6 @@
                 'En espera de recibir mercancía'
             ];
 
-            document.getElementById('monitor-btn-start').onclick = () => {
-                renderMonitor();
-                document.getElementById('start-screen').classList.add('hidden');
-                document.getElementById('monitor-screen').classList.remove('hidden');
-            };
-
-            document.getElementById('back-from-monitor-btn').onclick = () => {
-                document.getElementById('monitor-screen').classList.add('hidden');
-                document.getElementById('start-screen').classList.remove('hidden');
-            };
 
             function renderMonitor() {
                 const container = document.getElementById('monitor-content');

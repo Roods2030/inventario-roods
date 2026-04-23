@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             box-sizing: border-box;
@@ -1251,47 +1252,9 @@
             };
             let isSyncing = false;
 
-            const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycby6b_dDBnO5LlFAYtgG4StJfOuiy6V1j0uiYoZz2NQXWfmNT4wjYOzWBwZKBxa8-vNG/exec';
-
-            const sheetsAPI = {
-                async request(action, method = 'GET', data = null) {
-                    const url = new URL(SHEETS_API_URL);
-                    if (method === 'GET') {
-                        url.searchParams.append('action', action);
-                    }
-
-                    const options = {
-                        method: method === 'POST' ? 'POST' : 'GET',
-                        mode: 'cors',
-                        cache: 'no-cache',
-                        redirect: 'follow'
-                    };
-
-                    if (method === 'POST') {
-                        options.body = JSON.stringify({ action, data });
-                        // Explicitly NOT setting application/json to avoid preflight
-                    }
-
-                    try {
-                        const response = await fetch(url.toString(), options);
-                        const result = await response.json();
-                        if (!result.success) throw new Error(result.error);
-                        return result.data;
-                    } catch (error) {
-                        console.error('Sheets API Error:', error);
-                        throw error;
-                    }
-                },
-
-                async getProviders() { return this.request('getProviders'); },
-                async getInventories() { return this.request('getInventories'); },
-                async getOrders() { return this.request('getOrders'); },
-                async getAll() { return this.request('getAll'); },
-                async saveProviders(data) { return this.request('saveProviders', 'POST', data); },
-                async saveInventories(data) { return this.request('saveInventories', 'POST', data); },
-                async saveInventory(data) { return this.request('saveInventory', 'POST', data); },
-                async saveOrders(data) { return this.request('saveOrders', 'POST', data); }
-            };
+            const SUPABASE_URL = 'https://ilxdmxuvsefkqijeodlv.supabase.co'; // REEMPLAZAR AQUÍ CON TU PROJECT URL
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlseGRteHV2c2Vma3FpamVvZGx2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTQzNDAsImV4cCI6MjA5MTg3MDM0MH0.9R2bGdEKX-Jdtjcp0OW7Mq63XX7bVPWhR9pB_FC98dI'; // REEMPLAZAR AQUÍ CON TU ANON PUBLIC KEY
+            const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
             function updateSyncStatus(status) {
                 const indicator = document.getElementById('sync-indicator');
@@ -1365,21 +1328,40 @@
 
                 try {
                     updateSyncStatus('syncing');
-                    const remote = await sheetsAPI.getAll();
-                    console.log("Remote data fetched:", remote);
+                    
+                    const [provRes, ordRes, invRes] = await Promise.all([
+                        supabaseClient.from('inventory_providers').select('*'),
+                        supabaseClient.from('inventory_orders').select('*'),
+                        supabaseClient.from('inventory_records').select('*')
+                    ]);
+
+                    let remoteProviders = provRes.data ? provRes.data.map(r => r.data) : [];
+                    let remoteOrders = ordRes.data ? ordRes.data.map(r => r.data) : [];
+                    let remoteInventories = invRes.data ? invRes.data.map(r => r.data) : [];
+
+                    // MIGRACIÓN AUTOMÁTICA DE PROVEEDORES
+                    if (remoteProviders.length === 0 && providers.length > 0) {
+                        console.log("Migrando proveedores locales hacia Supabase por primera vez...");
+                        const uploadProvData = providers.map(p => ({
+                            name: p.name,
+                            data: p
+                        }));
+                        await supabaseClient.from('inventory_providers').upsert(uploadProvData);
+                        remoteProviders = providers;
+                    }
 
                     let changed = false;
 
-                    if (remote.providers) {
-                        if (JSON.stringify(providers) !== JSON.stringify(remote.providers)) {
-                            providers = remote.providers;
+                    if (remoteProviders.length > 0) {
+                        if (JSON.stringify(providers) !== JSON.stringify(remoteProviders)) {
+                            providers = remoteProviders;
                             localStorage.setItem('providers', JSON.stringify(providers));
                             changed = true;
                         }
                     }
 
-                    if (remote.orders) {
-                        const mergedOrders = mergeArrays(purchaseHistory, remote.orders);
+                    if (remoteOrders) {
+                        const mergedOrders = mergeArrays(purchaseHistory, remoteOrders);
                         if (JSON.stringify(purchaseHistory) !== JSON.stringify(mergedOrders)) {
                             purchaseHistory = mergedOrders;
                             localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
@@ -1387,8 +1369,8 @@
                         }
                     }
 
-                    if (remote.inventories) {
-                        const mergedInvs = mergeArrays(inventoryHistory, remote.inventories);
+                    if (remoteInventories) {
+                        const mergedInvs = mergeArrays(inventoryHistory, remoteInventories);
                         if (JSON.stringify(inventoryHistory) !== JSON.stringify(mergedInvs)) {
                             inventoryHistory = mergedInvs;
                             localStorage.setItem('inventoryHistory', JSON.stringify(inventoryHistory));
@@ -1429,11 +1411,18 @@
 
                 try {
                     updateSyncStatus('syncing');
-                    await Promise.all([
-                        sheetsAPI.saveProviders(providers),
-                        sheetsAPI.saveInventories(inventoryHistory),
-                        sheetsAPI.saveOrders(purchaseHistory)
-                    ]);
+
+                    const uploadProviders = providers.map(p => ({ name: p.name, data: p }));
+                    const uploadOrders = purchaseHistory.map(o => ({ id: o.id, data: o }));
+                    const uploadInventories = inventoryHistory.map(i => ({ id: i.id, data: i }));
+
+                    const promises = [];
+                    if (uploadProviders.length > 0) promises.push(supabaseClient.from('inventory_providers').upsert(uploadProviders));
+                    if (uploadInventories.length > 0) promises.push(supabaseClient.from('inventory_records').upsert(uploadInventories));
+                    if (uploadOrders.length > 0) promises.push(supabaseClient.from('inventory_orders').upsert(uploadOrders));
+
+                    await Promise.all(promises);
+
                     console.log("Remote save successful.");
                     updateSyncStatus('success');
                 } catch (err) {

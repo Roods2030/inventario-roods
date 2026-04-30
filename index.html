@@ -1289,10 +1289,34 @@
 
             // Helper for Smart Merge
             function mergeArrays(local, remote, key = 'id', sortBy = 'id') {
-                if (!remote || remote.length === 0) return local;
                 const map = new Map();
-                local.forEach(item => map.set(item[key], item));
-                remote.forEach(item => map.set(item[key], item));
+                const remoteKeys = new Set((remote || []).map(item => item[key]));
+                
+                const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+                const now = Date.now();
+
+                (local || []).forEach(item => {
+                    let isOld = false;
+                    if (item[key]) {
+                        const parts = item[key].toString().split('_');
+                        if (parts.length > 1) {
+                            const ts = parseInt(parts[1]);
+                            if (!isNaN(ts) && (now - ts > SEVEN_DAYS_MS)) {
+                                isOld = true;
+                            }
+                        }
+                    }
+                    // Si el elemento es viejo y NO está en la base de datos remota, lo descartamos
+                    if (isOld && !remoteKeys.has(item[key])) {
+                        console.log(`Descartando caché local antigua para evitar subida accidental: ${item[key]}`);
+                        return;
+                    }
+                    map.set(item[key], item);
+                });
+
+                if (remote) {
+                    remote.forEach(item => map.set(item[key], item));
+                }
 
                 const merged = Array.from(map.values());
                 if (sortBy === 'id') {

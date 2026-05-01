@@ -2564,11 +2564,76 @@
                     </div>
                 `).join('');
 
-                    const status = orderRecord.statuses ? (orderRecord.statuses[providerName] || 'CREADA') : 'CREADA';
+                    const currentStatus = orderRecord.statuses ? (orderRecord.statuses[providerName] || 'OC Generada') : 'OC Generada';
+                    const sIndex = PURCHASE_STATUSES.indexOf(currentStatus);
+                    const currentIndex = sIndex >= 0 ? sIndex : 0;
+                    
                     let statusColor = 'bg-slate-600';
-                    if (status === 'SOLICITADO') statusColor = 'bg-yellow-600';
-                    if (status === 'PAGADA') statusColor = 'bg-green-600';
-                    if (status === 'COTIZADA') statusColor = 'bg-blue-600';
+                    if (currentIndex === 1) statusColor = 'bg-blue-600';
+                    if (currentIndex === 2) statusColor = 'bg-indigo-600';
+                    if (currentIndex === 3) statusColor = 'bg-yellow-600';
+                    if (currentIndex === 4) statusColor = 'bg-emerald-600';
+                    if (currentIndex === 5) statusColor = 'bg-purple-600';
+
+                    const timelineHtml = PURCHASE_STATUSES.map((stepName, i) => {
+                        const isCompleted = i <= currentIndex;
+                        const isCurrent = i === currentIndex + 1; // The next actionable step
+                        
+                        let btnHtml = '';
+                        if (i === 1 && !isCompleted && isCurrent) {
+                            btnHtml = `<button class="aprobacion-finanzas-btn bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-2 py-1 rounded mt-1 transition" data-provider="${providerName}">Aprobar (PIN)</button>`;
+                        } else if (i === 2 && !isCompleted && isCurrent) {
+                            btnHtml = `
+                                <div class="flex gap-2 mt-1">
+                                    <button class="pdf-btn bg-slate-700 hover:bg-slate-600 text-white text-[10px] px-2 py-1 rounded transition" data-provider="${providerName}">📄 PDF</button>
+                                    <button class="whatsapp-btn bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-2 py-1 rounded transition" data-provider="${providerName}">📱 WA</button>
+                                    <button class="mark-sent-btn bg-blue-600 hover:bg-blue-500 text-white text-[10px] px-2 py-1 rounded transition" data-provider="${providerName}">Marcar Enviada</button>
+                                </div>
+                            `;
+                        } else if (i === 3 && !isCompleted && isCurrent) {
+                            btnHtml = `<button class="finance-btn bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] px-2 py-1 rounded mt-1 transition shadow-lg shadow-indigo-500/20" data-provider="${providerName}">💸 Solicitar Pago a Finanzas</button>`;
+                        } else if (i === 4 && !isCompleted && isCurrent) {
+                            btnHtml = `
+                                <div class="flex flex-col gap-2 mt-1 bg-slate-900/50 p-2 rounded border border-slate-600">
+                                    <input type="file" accept="image/*" class="text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-slate-700 file:text-white" id="receipt-upload-${orderRecord.id}-${providerName}">
+                                    <button class="upload-receipt-btn bg-green-600 hover:bg-green-500 text-white text-[10px] px-2 py-1 rounded transition" data-provider="${providerName}">Subir Comprobante y Marcar Pagado</button>
+                                </div>
+                            `;
+                        } else if (i === 5 && !isCompleted && isCurrent) {
+                            btnHtml = `<button class="mark-received-btn bg-purple-600 hover:bg-purple-500 text-white text-[10px] px-2 py-1 rounded mt-1 transition" data-provider="${providerName}">Mercancía Recibida</button>`;
+                        }
+
+                        if (i === 2 && isCompleted) {
+                            btnHtml = `
+                                <div class="flex gap-2 mt-1">
+                                    <button class="pdf-btn bg-slate-700 hover:bg-slate-600 text-white text-[10px] px-2 py-1 rounded transition" data-provider="${providerName}">📄 PDF</button>
+                                    <button class="whatsapp-btn bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-2 py-1 rounded transition" data-provider="${providerName}">📱 WA</button>
+                                </div>
+                            `;
+                        }
+                        
+                        let receiptHtml = '';
+                        if (i === 4 && isCompleted) {
+                            const receiptData = orderRecord.receipts ? orderRecord.receipts[providerName] : null;
+                            if (receiptData) {
+                                receiptHtml = `<img src="${receiptData}" class="mt-2 h-16 rounded cursor-pointer border border-slate-600 hover:border-emerald-500 transition" onclick="window.open('${receiptData}', '_blank')">`;
+                            }
+                        }
+
+                        return `
+                        <div class="flex items-start gap-3 relative pb-4">
+                            ${i < PURCHASE_STATUSES.length - 1 ? `<div class="absolute left-2.5 top-5 bottom-0 w-px ${isCompleted ? 'bg-emerald-500' : 'bg-slate-700'}"></div>` : ''}
+                            <div class="relative z-10 mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center bg-slate-800 ${isCompleted ? 'border-emerald-500' : 'border-slate-600'}">
+                                ${isCompleted ? '<span class="text-emerald-500 text-[10px]">✓</span>' : ''}
+                            </div>
+                            <div class="flex-1 -mt-1">
+                                <p class="text-sm font-medium ${isCompleted ? 'text-white' : (isCurrent ? 'text-emerald-400 font-bold' : 'text-slate-500')}">${stepName}</p>
+                                ${btnHtml}
+                                ${receiptHtml}
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
 
                     card.innerHTML = `
                     <div class="bg-gradient-to-r ${providerConfig.color} p-4 flex justify-between items-center">
@@ -2576,7 +2641,7 @@
                             <span class="text-2xl">${providerConfig.icon}</span>
                             <div>
                                 <h3 class="text-xl font-bold text-white">${providerName}</h3>
-                                <span class="${statusColor} text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-white/20">${status}</span>
+                                <span class="${statusColor} text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-white/20">${currentStatus}</span>
                             </div>
                         </div>
                         <div class="flex gap-2">
@@ -2592,26 +2657,73 @@
                                 <span>$${items.reduce((sum, item) => sum + (item.purchase * (item.lastPrice || 0)), 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 gap-3">
-                             <div class="grid grid-cols-2 gap-3">
-                                <button class="pdf-btn bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs" data-provider="${providerName}">📄 PDF</button>
-                                <button class="whatsapp-btn bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs" data-provider="${providerName}">📱 WA</button>
-                             </div>
-                             ${status !== 'PAGADA' ? `<button class="finance-btn bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition font-bold shadow-lg shadow-indigo-500/20" data-provider="${providerName}">💸 Solicitar Pago a Finanzas</button>` : ''}
-                             ${status === 'SOLICITADO' ? `<button class="paid-btn bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition font-bold shadow-lg shadow-green-500/20" data-provider="${providerName}">✅ Marcar como Pagado</button>` : ''}
+                        
+                        <div class="mt-6 bg-slate-900/50 rounded-xl p-4 border border-slate-700">
+                            <h4 class="text-white font-bold mb-4 text-xs tracking-wider uppercase">Progreso de la Orden</h4>
+                            ${timelineHtml}
                         </div>
                     </div>
-                `;
+                    `;
 
                     card.querySelector('.edit-order-btn').onclick = () => openEditOrderModal(providerName);
-                    card.querySelector('.pdf-btn').onclick = () => generatePDF(providerName, items, orderRecord);
-                    card.querySelector('.whatsapp-btn').onclick = () => sendWhatsApp(providerName, items, orderRecord);
+                    
+                    const btnFinanzas = card.querySelector('.aprobacion-finanzas-btn');
+                    if (btnFinanzas) btnFinanzas.onclick = () => {
+                        const pin = prompt("Ingrese el PIN de Finanzas para autorizar:");
+                        if (pin === "2323") {
+                            updateOrderStatus(providerName, 'OC Aprobada por finanzas');
+                        } else if (pin !== null) {
+                            alert("PIN incorrecto.");
+                        }
+                    };
 
-                    const financeBtn = card.querySelector('.finance-btn');
-                    if (financeBtn) financeBtn.onclick = () => openFinanceModal(providerName);
+                    const btnPdf = card.querySelector('.pdf-btn');
+                    if (btnPdf) btnPdf.onclick = () => generatePDF(providerName, items, orderRecord);
+                    
+                    const btnWa = card.querySelector('.whatsapp-btn');
+                    if (btnWa) btnWa.onclick = () => sendWhatsApp(providerName, items, orderRecord);
+                    
+                    const btnSent = card.querySelector('.mark-sent-btn');
+                    if (btnSent) btnSent.onclick = () => updateOrderStatus(providerName, 'OC Enviada al proveedor');
+                    
+                    const btnFinance = card.querySelector('.finance-btn');
+                    if (btnFinance) btnFinance.onclick = () => openFinanceModal(providerName);
+                    
+                    const btnUpload = card.querySelector('.upload-receipt-btn');
+                    if (btnUpload) btnUpload.onclick = () => {
+                        const fileInput = card.querySelector(\`#receipt-upload-\${orderRecord.id}-\${providerName}\`);
+                        if (fileInput && fileInput.files[0]) {
+                            const file = fileInput.files[0];
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                const img = new Image();
+                                img.onload = function() {
+                                    const canvas = document.createElement('canvas');
+                                    const max_width = 800;
+                                    let scaleSize = 1;
+                                    if (img.width > max_width) {
+                                        scaleSize = max_width / img.width;
+                                    }
+                                    canvas.width = img.width * scaleSize;
+                                    canvas.height = img.height * scaleSize;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                                    
+                                    if (!orderRecord.receipts) orderRecord.receipts = {};
+                                    orderRecord.receipts[providerName] = dataUrl;
+                                    updateOrderStatus(providerName, 'Pago realizado');
+                                }
+                                img.src = e.target.result;
+                            }
+                            reader.readAsDataURL(file);
+                        } else {
+                            alert("Por favor selecciona una imagen primero.");
+                        }
+                    };
 
-                    const paidBtn = card.querySelector('.paid-btn');
-                    if (paidBtn) paidBtn.onclick = () => updateOrderStatus(providerName, 'PAGADA');
+                    const btnReceived = card.querySelector('.mark-received-btn');
+                    if (btnReceived) btnReceived.onclick = () => updateOrderStatus(providerName, 'Mercancía recibida y almacenada');
 
                     container.appendChild(card);
                 });
@@ -3126,31 +3238,25 @@
                 if (!currentViewingOrder.statuses) currentViewingOrder.statuses = {};
                 currentViewingOrder.statuses[providerName] = newStatus;
 
-                // Point 5: Auto-update monitor status based on OC status
-                if (newStatus === 'SOLICITADO') {
-                    updateMonitorStatus(currentViewingOrder.id, providerName, 'Solicitud de pago enviada a finanzas');
-                } else if (newStatus === 'PAGADA') {
-                    updateMonitorStatus(currentViewingOrder.id, providerName, 'Pago realizado por finanzas');
-                }
+                updateMonitorStatus(currentViewingOrder.id, providerName, newStatus);
 
                 saveData();
                 renderPurchasePreview(currentViewingOrder);
             };
 
             document.getElementById('mark-requested-btn').onclick = () => {
-                updateOrderStatus(currentFinanceProvider, 'SOLICITADO');
+                updateOrderStatus(currentFinanceProvider, 'Solicitud de pago enviada');
                 document.getElementById('finance-modal').classList.add('hidden');
             };
 
             // Monitor de Compras Logic
             const PURCHASE_STATUSES = [
-                'OC Elaborada',
-                'OC Enviada a proveedor',
-                'OC Confirmada por proveedor',
-                'OC Actualizada por compras',
-                'Solicitud de pago enviada a finanzas',
-                'Pago realizado por finanzas',
-                'En espera de recibir mercancía'
+                'OC Generada',
+                'OC Aprobada por finanzas',
+                'OC Enviada al proveedor',
+                'Solicitud de pago enviada',
+                'Pago realizado',
+                'Mercancía recibida y almacenada'
             ];
 
 

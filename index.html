@@ -3,8 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Inventario Roods</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Roods Inv">
+    <link rel="apple-touch-icon" href="app-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap"
         rel="stylesheet">
@@ -1374,6 +1379,10 @@
                         remoteProviders = providers;
                     }
 
+                    if (remoteProviders.length > 0) {
+                        remoteProviders.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+                    }
+
                     let changed = false;
 
                     if (remoteProviders.length > 0) {
@@ -1436,6 +1445,9 @@
                 try {
                     updateSyncStatus('syncing');
 
+                    providers.forEach((p, index) => {
+                        p.orderIndex = index;
+                    });
                     const uploadProviders = providers.map(p => ({ name: p.name, data: p }));
                     const uploadOrders = purchaseHistory.map(o => ({ id: o.id, data: o }));
                     const uploadInventories = inventoryHistory.map(i => ({ id: i.id, data: i }));
@@ -1841,10 +1853,6 @@
                         else if (btn.classList.contains('whatsapp-btn')) {
                             const items = currentViewingOrder.orders[providerName];
                             sendWhatsApp(providerName, items, currentViewingOrder);
-                        }
-                        else if (btn.classList.contains('email-btn')) {
-                            const items = currentViewingOrder.orders[providerName];
-                            sendEmail(providerName, items, currentViewingOrder);
                         }
                         else if (btn.classList.contains('finance-btn')) openFinanceModal(providerName);
                         else if (btn.classList.contains('paid-btn')) updateOrderStatus(providerName, 'PAGADA');
@@ -2585,10 +2593,9 @@
                             </div>
                         </div>
                         <div class="grid grid-cols-1 gap-3">
-                             <div class="grid grid-cols-3 gap-3">
+                             <div class="grid grid-cols-2 gap-3">
                                 <button class="pdf-btn bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs" data-provider="${providerName}">📄 PDF</button>
                                 <button class="whatsapp-btn bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs" data-provider="${providerName}">📱 WA</button>
-                                <button class="email-btn bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs" data-provider="${providerName}">📧 Mail</button>
                              </div>
                              ${status !== 'PAGADA' ? `<button class="finance-btn bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition font-bold shadow-lg shadow-indigo-500/20" data-provider="${providerName}">💸 Solicitar Pago a Finanzas</button>` : ''}
                              ${status === 'SOLICITADO' ? `<button class="paid-btn bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition font-bold shadow-lg shadow-green-500/20" data-provider="${providerName}">✅ Marcar como Pagado</button>` : ''}
@@ -2599,7 +2606,6 @@
                     card.querySelector('.edit-order-btn').onclick = () => openEditOrderModal(providerName);
                     card.querySelector('.pdf-btn').onclick = () => generatePDF(providerName, items, orderRecord);
                     card.querySelector('.whatsapp-btn').onclick = () => sendWhatsApp(providerName, items, orderRecord);
-                    card.querySelector('.email-btn').onclick = () => sendEmail(providerName, items, orderRecord);
 
                     const financeBtn = card.querySelector('.finance-btn');
                     if (financeBtn) financeBtn.onclick = () => openFinanceModal(providerName);

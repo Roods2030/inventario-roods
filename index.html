@@ -2691,7 +2691,7 @@
                     
                     const btnUpload = card.querySelector('.upload-receipt-btn');
                     if (btnUpload) btnUpload.onclick = () => {
-                        const fileInput = card.querySelector(\`#receipt-upload-\${orderRecord.id}-\${providerName}\`);
+                        const fileInput = card.querySelector(`[id="receipt-upload-${orderRecord.id}-${providerName}"]`);
                         if (fileInput && fileInput.files[0]) {
                             const file = fileInput.files[0];
                             const reader = new FileReader();
